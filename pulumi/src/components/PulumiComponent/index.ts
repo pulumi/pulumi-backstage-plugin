@@ -1,0 +1,1 @@
+export {PulumiComponent} from './PulumiComponent'
