@@ -276,8 +276,7 @@ And your system entity with the following:
 
 ```yaml
 annotations:
-  pulumi.com/orga-slug:
-    <Pulumi Cloud: org>
+  pulumi.com/orga-slug: <Pulumi Cloud: org>
 ```
 
 Next, provide the API token that the client will use to make requests to the Pulumi Cloud API.
