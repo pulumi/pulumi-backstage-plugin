@@ -1,0 +1,1 @@
+export { PulumiIcon,DeploymentIcon } from './PulumiIcon';
