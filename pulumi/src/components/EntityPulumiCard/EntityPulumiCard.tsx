@@ -32,9 +32,6 @@ import {
     AccordionDetails,
 } from '@material-ui/core';
 import {PulumiIcon} from '../PulumiIcon';
-import { type } from 'os';
-import { ProjectDetail } from '../../api/types';
-import { title } from 'process';
 
 const useStyles = makeStyles<Theme>({
     externalLinkIcon: {
