@@ -188,7 +188,7 @@ export const EntityPulumiCard = () => {
     } = useAsync(async () => {
         const stacks = await api.getStack(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '');
 
-        const project = await api.getProjectDetails(stacks.orgName,entity.metadata.name)
+        const project = await api.getProjectDetails(stacks.orgName,stacks.projectName)
         return  {
             stack: stacks,
             project: project,
