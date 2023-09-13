@@ -269,7 +269,6 @@ export const ActivityTable = () => {
     const activityData = async (query: { page: number, pageSize: number }) => {
         if (query) {
             const updates = (await api.listStackUpdates(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '', query.page + 1, query.pageSize));
-            console.log(updates.activity)
             return {
                 data: updates.activity ?? [],
                 page: query.page,
