@@ -14,6 +14,31 @@ This repository contains the following Backstage plugins and modules:
 
 ## Pulumi Scaffolder Backend Module
 
+### Requirements
+
+#### Pulumi CLI
+You need to have the Pulumi CLI installed on the Backstage server.
+
+If you use the Backstage Dockerfile, add following lines after the `FROM` line:
+
+```Dockerfile
+RUN <<EOF
+## Install pulumi and set to PATH
+curl -fsSL https://get.pulumi.com | sh
+PATH="/root/.pulumi/bin:${PATH}"
+EOF
+````
+
+This will install the latest Pulumi CLI to your Backstage container.
+
+#### Pulumi Personal Access Token (PAT)
+
+To authenticate to the Pulumi cloud service, you need to provide additionally the Pulumi Personal Access Token via the environment variable `PULUMI_ACCESS_TOKEN``
+
+#### Programming languages runtimes
+
+If you not going to use the [Pulumi Deployment](https://www.pulumi.com/docs/pulumi-cloud/deployments/) service, you need to be sure that all the programming language runtimes are installed on your Backstage service
+
 ### Getting Started
 
 You need to configure the action in your backend:
