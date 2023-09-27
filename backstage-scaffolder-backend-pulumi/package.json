@@ -1,5 +1,5 @@
 {
-  "name": "@ediri/scaffolder-backend-module-pulumi",
+  "name": "@pulumi/backstage-scaffolder-backend-pulumi",
   "version": "0.3.11",
   "main": "dist/index.cjs.js",
   "types": "dist/index.d.ts",

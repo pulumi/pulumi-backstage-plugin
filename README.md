@@ -22,7 +22,7 @@ You need to configure the action in your backend:
 
 ```bash
 # From your Backstage root directory
-yarn add --cwd packages/backend @ediri/scaffolder-backend-module-pulumi
+yarn add --cwd packages/backend @pulumi/backstage-scaffolder-backend-pulumi
 ```
 
 Configure the action:(you can check
@@ -34,7 +34,7 @@ see all options):
 import {
     pulumiNewAction,
     pulumiUpAction
-} from '@ediri/scaffolder-backend-module-pulumi';
+} from '@pulumi/backstage-scaffolder-backend-pulumi';
 
 const actions = [
     pulumiNewAction(),
@@ -201,7 +201,7 @@ First, install the Pulumi plugin via a CLI:
 
 ```bash
 # From your Backstage root directory
-yarn add --cwd packages/app @ediri/plugin-pulumi
+yarn add --cwd packages/app @pulumi/backstage-plugin-pulumi
 ```
 
 Next, add the plugin to EntityPage.tsx in `packages/app/src/components/catalog by adding the following code snippets.
@@ -214,7 +214,7 @@ import {
     EntityPulumiCard,
     EntityPulumiMetdataCard,
     PulumiComponent
-} from '@ediri/plugin-pulumi';
+} from '@pulumi/backstage-plugin-pulumi';
 ```
 
 Then create a new constant for the Pulumi Component:
@@ -311,5 +311,5 @@ This will proxy the request by adding an Authorization header with the provided 
 
 ```bash
 # From your Backstage root directory
-yarn remove --cwd packages/app @ediri/plugin-pulumi
+yarn remove --cwd packages/app @pulumi/backstage-plugin-pulumi
 ```
