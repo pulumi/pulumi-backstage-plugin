@@ -25,7 +25,7 @@ You need to configure the action in your backend:
 yarn add --cwd packages/backend @pulumi/backstage-scaffolder-backend-pulumi
 ```
 
-Configure the action:(you can check
+Configure the action (you can check
 the [docs](https://backstage.io/docs/features/software-templates/writing-custom-actions#registering-custom-actions) to
 see all options):
 
@@ -195,7 +195,7 @@ If you need any help with this plugin, feel free to reach out to me!
 
 The file paths mentioned in the following steps are relative to your app's root directory — for example, the directory
 created by following the [Getting Started](https://backstage.io/docs/getting-started/) guide and creating your app with
-npx @backstage/create-app.
+`npx @backstage/create-app`.
 
 First, install the Pulumi plugin via a CLI:
 
@@ -204,7 +204,7 @@ First, install the Pulumi plugin via a CLI:
 yarn add --cwd packages/app @pulumi/backstage-plugin-pulumi
 ```
 
-Next, add the plugin to EntityPage.tsx in `packages/app/src/components/catalog by adding the following code snippets.
+Next, add the plugin to `EntityPage.tsx` in `packages/app/src/components/catalog` by adding the following code snippets.
 
 Add the following imports to the top of the file:
 
@@ -281,7 +281,7 @@ annotations:
 
 Next, provide the API token that the client will use to make requests to the Pulumi Cloud API.
 
-Add the proxy configuration in app-config.yaml:
+Add the proxy configuration in `app-config.yaml`:
 
 ```yaml
 proxy:
@@ -301,12 +301,12 @@ export PULUMI_ACCESS_TOKEN='<PULUMI_ACCESS_TOKEN>'
 yarn start
 ```
 
-This will proxy the request by adding an Authorization header with the provided token.
+This will proxy the request by adding an `Authorization` header with the provided token.
 
 #### How to Uninstall
 
-1. Remove any configuration added in Backstage yaml files, such as the proxy configuration in app-config.yaml and the integration key in an entity's annotations.
-1. Remove the added code snippets from EntityPage.tsx
+1. Remove any configuration added in Backstage yaml files, such as the proxy configuration in `app-config.yaml` and the integration key in an entity's annotations.
+1. Remove the added code snippets from `EntityPage.tsx`
 1. Remove the plugin package:
 
 ```bash

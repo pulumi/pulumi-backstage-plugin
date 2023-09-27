@@ -4,7 +4,7 @@ import {
     PULUMI_PROJECT_SLUG_ANNOTATION
 } from '../constants';
 import {Entity} from '@backstage/catalog-model';
-import {Stack, pulumiApiRef} from '../../api';
+import {pulumiApiRef} from '../../api';
 import {useEntity} from '@backstage/plugin-catalog-react';
 import {
     Progress,
@@ -21,10 +21,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Cloud from '@material-ui/icons/Cloud';
 import {
     CardContent,
-    makeStyles,
-    Theme,
     CardHeader,
-    Divider,
     Grid,
     Typography,
     Accordion,
@@ -32,13 +29,6 @@ import {
     AccordionDetails,
 } from '@material-ui/core';
 import {PulumiIcon} from '../PulumiIcon';
-
-const useStyles = makeStyles<Theme>({
-    externalLinkIcon: {
-        fontSize: 'inherit',
-        verticalAlign: 'bottom',
-    },
-});
 
 type PulumiCardProps = {
     children: ReactNode;
@@ -132,9 +122,9 @@ export const EntityPulumiMetdataCard = () => {
           return acc;
         },
         {} as Record<string, number>
-      );
+      ) || {} as Record<string, number>;
       // add the "Other" category
-      metadata['Other'] = systemCard?.dashboard.aggregations?.package.others;
+    metadata['Other'] = systemCard?.dashboard.aggregations?.package.others || 0;
 
 
     return (

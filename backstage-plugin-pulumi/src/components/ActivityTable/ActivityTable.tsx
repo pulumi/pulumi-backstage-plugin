@@ -14,7 +14,7 @@ import {
     StatusRunning
 } from '@backstage/core-components';
 import {Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
-import {Info, ResourceChanges, Update} from "../../api/types";
+import {ResourceChanges} from "../../api/types";
 import { DeploymentIcon } from "../PulumiIcon";
 
 
@@ -242,7 +242,7 @@ export const ActivityTable = () => {
 
     ];
 
-    const previewData = async (query: { page: number, pageSize: number }) => {
+    const previewData = async (_query: { page: number, pageSize: number }) => {
         const previews = (await api.getPreviews(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? ''));
         if (previews.updates) {
             previews.updates = previews.updates.slice(0, 3);

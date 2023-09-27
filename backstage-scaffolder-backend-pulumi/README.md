@@ -8,10 +8,10 @@ You need to configure the action in your backend:
 
 ```bash
 # From your Backstage root directory
-yarn add --cwd packages/backend @ediri/scaffolder-backend-module-pulumi
+yarn add --cwd packages/backend @pulumi/backstage-scaffolder-backend-pulumi
 ```
 
-Configure the action:(you can check
+Configure the action (you can check
 the [docs](https://backstage.io/docs/features/software-templates/writing-custom-actions#registering-custom-actions) to
 see all options):
 
@@ -20,7 +20,7 @@ see all options):
 import {
     pulumiNewAction,
     pulumiUpAction
-} from '@ediri/scaffolder-backend-module-pulumi';
+} from '@pulumi/backstage-scaffolder-backend-pulumi';
 
 const actions = [
     pulumiNewAction(),
@@ -94,7 +94,6 @@ spec:
         folder: .
 ```
 
-
 ### Pulumi Up Action
 
 The Pulumi Up Action is a custom action that allows you to run the `pulumi up` command.
@@ -118,7 +117,6 @@ The Pulumi Up Action is a custom action that allows you to run the `pulumi up` c
 The action offers also Pulumi deployment support, to use it you need to set the `deployment` input to `true`. If you did
 not set any `config` or `secretConfig`, during the `pulumi:new` action, you need to set them here. If you have any
 provider related credentials, you need to set the `providerCredentialsFromEnv` input.
-
 
 ```yaml
 apiVersion: scaffolder.backstage.io/v1beta3

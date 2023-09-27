@@ -1,10 +1,8 @@
 import {PulumiClient, pulumiApiRef} from './api';
-import {rootRouteRef} from './routes';
 import {
     createApiFactory,
     createPlugin,
     createComponentExtension,
-    createRoutableExtension,
     discoveryApiRef,
     fetchApiRef,
 } from '@backstage/core-plugin-api';

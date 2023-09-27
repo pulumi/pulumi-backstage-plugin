@@ -76,7 +76,7 @@ export function pulumiUpAction() {
                     // If we are using Pulumi Deployment, we need to set the provider credentials from the environment variables
                     // and pas them as envVars to the RemoteWorkspace.createOrSelectStack method
                     const configCredentialsObject: { [k: string]: any } = {};
-                    if (ctx.input.providerCredentialsFromEnv !=null) {
+                    if (ctx.input.providerCredentialsFromEnv !== null) {
                         for (const providerCredentialEnvName of ctx.input.providerCredentialsFromEnv) {
                             configCredentialsObject[providerCredentialEnvName] = {
                                 secret: process.env[providerCredentialEnvName]

@@ -43,7 +43,7 @@ export function pulumiNewAction() {
 
                 const args = ['new', ctx.input.template, '--yes', '--force', '-n', ctx.input.name, '-s', stackName, '--dir', ctx.input.folder];
 
-                if (ctx.input.description != null) {
+                if (ctx.input.description !== null) {
                     args.push('-d', ctx.input.description);
                 }
 
@@ -68,7 +68,7 @@ export function pulumiNewAction() {
                 });
                 if (ctx.input.config) {
                     for (const [key, value] of Object.entries(ctx.input.config)) {
-                        if (value != null) {
+                        if (value !== null) {
                             await executeShellCommand({
                                 command: 'pulumi',
                                 args: ['config', 'set', key, value, '--stack', stackName, '--plaintext', '--non-interactive', '--cwd', ctx.input.folder],
@@ -82,7 +82,7 @@ export function pulumiNewAction() {
                 }
                 if (ctx.input.secretConfig) {
                     for (const [key, value] of Object.entries(ctx.input.secretConfig)) {
-                        if (value != null) {
+                        if (value !== null) {
                             await executeShellCommand({
                                 command: 'pulumi',
                                 args: ['config', 'set', key, value, '--stack', stackName, '--secret', '--non-interactive', '--cwd', ctx.input.folder],

@@ -21,7 +21,7 @@ export const pulumiApiRef = createApiRef<PulumiApi>({
 
 export class PulumiClient implements PulumiApi {
     static fromConfig(
-        configApi: ConfigApi,
+        _configApi: ConfigApi,
         dependencies: PulumiClientApiDependencies,
     ) {
         const {discoveryApi, fetchApi} = dependencies;

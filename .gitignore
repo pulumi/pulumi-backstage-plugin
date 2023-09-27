@@ -3,3 +3,4 @@
 **/dist-types
 **/yarn.lock
 **/package-lock.json
+**/pulumi-backstage-*.tgz
