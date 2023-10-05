@@ -1,0 +1,176 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: microservice-kubernetes-template
+  title: Microservice on Kubernetes
+  description: |
+    A template for creating a new Microservice on Kubernetes.
+    This template will create following components:
+    - Kubernetes cluster on the approved cloud provider
+    - GitHub repository for the microservice
+    - GitHub actions to build the microservice
+    - ArgoCD to deploy the microservice
+  tags:
+    - pulumi
+    - microservice
+    - kubernetes
+    - github
+    - argocd
+spec:
+  owner: user:dirien
+  type: infrastructure
+  parameters:
+    - title: Provide project information
+      required:
+        - component_id
+        - owner
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the component.
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Tell us more about this component.
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: Configure Infrastructure
+      required:
+        - stack
+        - resource
+      properties:
+        resource:
+          title: Kubernetes Cluster
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Resource
+        language:
+          title: Programming Language
+          type: string
+          enum:
+            - go
+            - typescript
+          enumNames:
+            - Go
+            - TypeScript
+          description: Programming language to use
+        stack:
+          title: Select stack
+          type: string
+          enum:
+            - dev
+            - staging
+            - prod
+          enumNames:
+            - Development
+            - Staging
+            - Production
+          description: The pulumi stack to use
+        scanner:
+          title: Select scanner
+          type: string
+          enum:
+            - trivy
+          enumNames:
+            - Trivy
+          description: The scanner to use
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+  steps:
+    - id: fetchSystem
+      name: Fetch System
+      action: catalog:fetch
+      input:
+        entityRef: ${{ parameters.resource }}
+
+    - id: template
+      name: Create Project
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: "${{ parameters.component_id }}-service"
+          description: ${{ parameters.description }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+          organization: ediri
+          stack: ${{ parameters.stack }}
+          owner: ${{ parameters.owner }}
+          dependsOn: ${{ parameters.resource }}
+          scanner: ${{ parameters.scanner }}
+
+    - id: pulumi-new-service
+      name: Create Service Pulumi Project
+      action: pulumi:new
+      input:
+        name: "${{ parameters.component_id }}-service"
+        description: ${{ parameters.description | dump }}
+        organization: ediri
+        stack: ${{ parameters.stack }}
+        template: "https://github.com/my-silly-organisation/microservice-civo/tree/main/service-${{ parameters.language }}"
+        config:
+          "infra:stack-reference-name": "ediri/${{ steps['fetchSystem'].output.entity.metadata.name }}/${{ parameters.stack }}"
+          "application-name": ${{ parameters.component_id }}
+          "application-namespace": ${{ parameters.component_id }}
+          "application-repo-path": kustomize
+          "application-repo-url": "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
+          "application-repo-target-revision": main
+        folder: service
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: [ "github.com" ]
+        repoVisibility: public
+        description: "This is ${{ parameters.component_id }}"
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        requiredApprovingReviewCount: 0
+        protectDefaultBranch: false
+
+    - id: register
+      name: Registering the Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+    - id: pulumi-deploy-services
+      name: Deploy Services (via Deployment)
+      action: pulumi:up
+      input:
+        deployment: true
+        name: "${{ parameters.component_id }}-service"
+        repoUrl: "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
+        repoProjectPath: service
+        repoBranch: main
+        organization: ediri
+        stack: ${{ parameters.stack }}
+
+  output:
+    links:
+      - title: Open the Source Code Repository
+        url: ${{ steps['publish'].output.repoContentsUrl }}
+      - title: Open the Catalog Info Component
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
