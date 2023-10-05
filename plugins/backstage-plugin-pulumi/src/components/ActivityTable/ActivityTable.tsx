@@ -15,7 +15,7 @@ import {
 } from '@backstage/core-components';
 import {Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
 import {ResourceChanges} from "../../api/types";
-import { DeploymentIcon } from "../PulumiIcon";
+import {DeploymentIcon} from "../PulumiIcon";
 
 
 export const isPluginApplicableToEntity = (entity: Entity) =>
@@ -28,76 +28,6 @@ export const ActivityTable = () => {
     const {entity} = useEntity();
     const api = useApi(pulumiApiRef);
 
-    /*
-    const {
-        value: service,
-        loading,
-        error,
-    } = useAsync(async () => {
-        const previews = (await api.getPreviews(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? ''));
-
-        return {
-            previews
-        }
-    });
-
-
-    if (error) {
-        let errorNode: ReactNode;
-        const orgName = entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION].split("/")[0];
-        switch (error.constructor) {
-            case UnauthorizedError:
-                errorNode = (
-                    <Alert severity="error">
-                        You are not authorized to view this information.
-                    </Alert>
-                );
-                break;
-            case NotFoundError:
-
-                errorNode = (
-                    <List>
-                        <ListItem>
-                            <Typography variant="h4">
-                                No stack informations found for this project
-                            </Typography>
-                        </ListItem>
-                        <ListItem>
-                            <Button variant="contained" color="primary"
-                                    href={`https://app.pulumi.com/site/new-project?owner=${orgName}`}>
-                                Create new project
-                            </Button>
-                        </ListItem>
-                        <ListItem>
-                            <EmptyState
-                                missing="info"
-                                title=""
-                                description="It looks like there is no Pulumi project associated with this entity. You can create a new project by clicking the button above."
-                            />
-                        </ListItem>
-                    </List>
-                );
-                break;
-            default:
-                errorNode = (
-                    <Alert severity="error">
-                        Error encountered while fetching information. {error.message}
-                    </Alert>
-                );
-        }
-
-        return <Box>{errorNode}</Box>;
-    }
-
-
-    if (loading) {
-        return (
-            <Box>
-                <Progress/>
-            </Box>
-        );
-    }
-*/
     const columns: TableColumn[] = [
         {
             title: 'Type', render: (row: any) => {
@@ -107,8 +37,8 @@ export const ActivityTable = () => {
                         if (row.update === undefined) {
                             return (
                                 <Grid item>
-                                    <DeploymentIcon style={{fontSize: 30}}/>  
-                                </Grid>     
+                                    <DeploymentIcon style={{fontSize: 30}}/>
+                                </Grid>
                             )
                         }
                         return null;
@@ -128,10 +58,10 @@ export const ActivityTable = () => {
                         kind = `${kind} (refresh)`
                     }
                     return (
-                        
+
                         <Link
                             to={linkUrl}>
-                            <Grid container direction="row" alignItems="center" spacing={2}>   
+                            <Grid container direction="row" alignItems="center" spacing={2}>
                                 {addIcon()}
                                 <Typography variant="body1" noWrap>
                                     {kind}
@@ -243,36 +173,53 @@ export const ActivityTable = () => {
     ];
 
     const previewData = async (_query: { page: number, pageSize: number }) => {
-        const previews = (await api.getPreviews(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? ''));
-        if (previews.updates) {
-            previews.updates = previews.updates.slice(0, 3);
-        }
-        const transformedData = {
-            updates: previews.updates?.map((activityItem) => {
-                return {
-                    update: {
-                        ...activityItem,
-                    },
-                };
-            }),
-            itemsPerPage: previews.itemsPerPage,
-            total: previews.total, // Set the total to the number of updates
-        };
+        try {
 
-        return {
-            data: transformedData.updates ?? [],
-            page: 0,
-            totalCount: transformedData.total,
+            const previews = (await api.getPreviews(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? ''));
+            if (previews.updates) {
+                previews.updates = previews.updates.slice(0, 3);
+            }
+            const transformedData = {
+                updates: previews.updates?.map((activityItem) => {
+                    return {
+                        update: {
+                            ...activityItem,
+                        },
+                    };
+                }),
+                itemsPerPage: previews.itemsPerPage,
+                total: previews.total, // Set the total to the number of updates
+            };
+
+            return {
+                data: transformedData.updates ?? [],
+                page: 0,
+                totalCount: transformedData.total,
+            }
+        } catch (e) {
+            return {
+                data: [],
+                page: 0,
+                totalCount: 0,
+            }
         }
     }
 
     const activityData = async (query: { page: number, pageSize: number }) => {
         if (query) {
-            const updates = (await api.listStackUpdates(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '', query.page + 1, query.pageSize));
-            return {
-                data: updates.activity ?? [],
-                page: query.page,
-                totalCount: updates.total,
+            try {
+                const updates = (await api.listStackUpdates(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '', query.page + 1, query.pageSize));
+                return {
+                    data: updates.activity ?? [],
+                    page: query.page,
+                    totalCount: updates.total,
+                }
+            } catch (e) {
+                return {
+                    data: [],
+                    page: query.page,
+                    totalCount: 0,
+                }
             }
         }
         return {

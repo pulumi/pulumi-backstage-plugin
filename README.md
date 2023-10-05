@@ -319,7 +319,7 @@ proxy:
       Content-Type: application/json
 ```
 
-Then, start the backend, passing the PagerDuty API token as an environment variable:
+Then, start the backend, passing the Pulumi Access Token as an environment variable:
 
 ```bash
 export PULUMI_ACCESS_TOKEN='<PULUMI_ACCESS_TOKEN>' 

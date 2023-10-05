@@ -33,15 +33,15 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
-          dir: ${{ matrix.plugin }}
+          dir: plugins/${{ matrix.plugin }}
 
       - name: type checking and declarations
         run: yarn tsc
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
 
       - name: build
         run: yarn build
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
 
   # A separate release build that is only run for commits that are the result of merging the "Version Packages" PR
   # We can't re-use the output from the above step, but we'll have a guaranteed node_modules cache and
@@ -78,21 +78,21 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
-          dir: ${{ matrix.plugin }}
+          dir: plugins/${{ matrix.plugin }}
 
       - name: type checking and declarations
         run: yarn tsc
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
 
       - name: build
         run: yarn build
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
 
       # Publishes current version of packages that are not already present in the registry
       - name: publish
         run: |
           yarn config set -H 'npmAuthToken' "${{secrets.NPM_TOKEN}}"
           npm publish --access public
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

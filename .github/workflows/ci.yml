@@ -36,12 +36,12 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
-          dir: ${{ matrix.plugin }}
+          dir: plugins/${{ matrix.plugin }}
 
       - name: type checking and declarations
         run: yarn tsc
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}
 
       - name: build
         run: yarn build
-        working-directory: ${{ matrix.plugin }}
+        working-directory: plugins/${{ matrix.plugin }}

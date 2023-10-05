@@ -118,6 +118,7 @@ export class PulumiClient implements PulumiApi {
         options: RequestInit,
     ): Promise<Response> {
         const response = await this.config.fetchApi.fetch(url, options);
+
         if (response.status === 401) {
             throw new UnauthorizedError();
         }

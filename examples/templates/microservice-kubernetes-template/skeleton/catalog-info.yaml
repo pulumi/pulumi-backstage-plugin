@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.name}}
+  {%- if values.description %}
+  description: ${{values.description | dump}}
+  {%- endif %}
+  annotations:
+    github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
+    pulumi.com/project-slug: ${{values.organization + "/" + values.name + "/" + values.stack}}
+spec:
+  type: service
+  lifecycle: development
+  owner: ${{values.owner | dump}}
+  dependsOn:
+    - ${{values.dependsOn}}
