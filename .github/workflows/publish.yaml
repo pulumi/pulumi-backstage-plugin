@@ -1,0 +1,35 @@
+name: Publish Package to npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        # get all the tags from git
+        fetch-depth: 0
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - run: |
+        cd backstage-plugin-pulumi
+        yarn install --frozen-lockfile
+        
+        # copy over the example npmrc file and publish
+        cp ../../hack/.npmrc.example .npmrc
+        cp ../../hack/publish.sh publish.sh
+        ./publish.sh
+        cd ..
+        
+        cd backstage-scaffolder-backend-pulumi
+        yarn install --frozen-lockfile
+        
+        # copy over the example npmrc file and publish
+        cp ../../hack/.npmrc.example .npmrc
+        cp ../../hack/publish.sh publish.sh
+        ./publish.sh
+      working-directory: plugins
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
