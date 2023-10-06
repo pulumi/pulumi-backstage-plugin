@@ -1,47 +1,29 @@
-name: Build Packages
+name: CI
+
 on:
   push:
     branches:
-      - main
+    - main
     tags-ignore:
-      - v*
-      - sdk/*
-      - "**"
+    - v*
+    - sdk/*
+    - "**"
+  pull_request:
+    branches:
+    - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [18.x]
-        plugin:
-          - 'backstage-plugin-pulumi'
-          - 'backstage-scaffolder-backend-pulumi'
-          
-    env:
-      CI: true
-      NODE_OPTIONS: --max-old-space-size=4096
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: use node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: https://registry.npmjs.org/ # Needed for auth
-      - name: yarn install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install
-          dir: plugins/${{ matrix.plugin }}
-
-      - name: type checking and declarations
-        run: yarn tsc
-        working-directory: plugins/${{ matrix.plugin }}
-
-      - name: build
-        run: yarn build
-        working-directory: plugins/${{ matrix.plugin }}
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - run: yarn install
+    - run: yarn lint
+    - run: yarn tsc
+    #- run: yarn test
+    - run: yarn build:all
