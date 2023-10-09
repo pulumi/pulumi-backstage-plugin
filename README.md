@@ -200,15 +200,15 @@ spec:
 
 #### Pulumi Card (Component Overview)
 
-<img src="doc/component.png" width="500">
+<img src="plugins/backstage-plugin-pulumi/doc/component.png" width="500">
 
 #### Pulumi Card (System Overview)
 
-<img src="doc/system.png" width="500">
+<img src="plugins/backstage-plugin-pulumi/doc/doc/system.png" width="500">
 
 #### Pulumi Activity View
 
-<img src="doc/activity.png" width="500">
+<img src="plugins/backstage-plugin-pulumi/doc/doc/activity.png" width="500">
 
 ### Support
 
