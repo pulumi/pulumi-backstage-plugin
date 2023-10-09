@@ -6,7 +6,7 @@
   "license": "MPL-2.0",
   "publishConfig": {
     "access": "public",
-    "main": "dist/index.esm.js",
+    "main": "dist/index.cjs.js",
     "types": "dist/index.d.ts"
   },
   "backstage": {
@@ -24,9 +24,9 @@
   "dependencies": {
     "@backstage/errors": "^1.2.1",
     "@backstage/integration": "^1.5.1",
+    "@backstage/plugin-scaffolder-backend": "^1.15.1",
     "@backstage/plugin-scaffolder-node": "^0.1.5",
     "@backstage/types": "^1.1.0",
-    "@backstage/plugin-scaffolder-backend": "^1.15.1",
     "@pulumi/pulumi": "^3.77.1",
     "@types/node": "*",
     "zod": "^3.21.4"
