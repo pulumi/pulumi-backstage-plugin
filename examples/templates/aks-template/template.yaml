@@ -1,0 +1,200 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: eks
+  title: Create a new AKS cluster
+  description: |
+    A template for creating a new AKS cluster via Pulumi.
+  tags:
+  - pulumi
+  - aks
+  - kubernetes
+  - azure
+spec:
+  owner: user:guest
+  type: infrastructure
+  parameters:
+  - title: Provide project information
+    required:
+    - name
+    - owner
+    properties:
+      name:
+        title: Name
+        type: string
+        description: Unique name of the Pulumi project.
+        ui:
+          field: EntityNamePicker
+      description:
+        title: Description
+        type: string
+        description: Tell us more about this project.
+      system:
+        title: System
+        type: string
+        description: System this component belongs to.
+        ui:field: EntityPicker
+        ui:options:
+          catalogFilter:
+            kind:
+            - System
+      owner:
+        title: Owner
+        type: string
+        description: Owner of the component
+        ui:field: OwnerPicker
+        ui:options:
+          allowedKinds:
+          - Group
+  - title: Configure Pulumi template
+    required:
+    - stack
+    - organization
+    properties:
+      organization:
+        title: Organization
+        type: string
+        description: The Pulumi organization to use for the Pulumi project
+      language:
+        title: Programming Language
+        type: string
+        enum:
+        - go
+        - typescript
+        - csharp
+        - python
+        enumNames:
+        - Go
+        - TypeScript
+        - C#
+        - Python
+        description: Programming language to use
+      stack:
+        title: Select stack
+        type: string
+        enum:
+        - dev
+        - staging
+        - prod
+        enumNames:
+        - Development
+        - Staging
+        - Production
+        description: The pulumi stack to use
+      numWorkerNodes:
+        title: Number of worker nodes
+        type: integer
+        description: Number of worker nodes to create
+        default: 3
+      kubernetesVersion:
+        title: Kubernetes version
+        type: string
+        description: Version of Kubernetes to use
+        enum:
+        - 1.28.0
+        - 1.27.3
+        - 1.26.6
+        default: 1.28.0
+      nodeVmSize:
+        title: Node VM size
+        type: string
+        description: Size of the VMs to use for the worker nodes
+        enum:
+        - Standard_DS2_v2
+        - Standard_D4s_v3
+        - Standard_B2s
+        - Standard_B2ms
+        default: Standard_DS2_v2
+      sshPubKey:
+        title: SSH Public Key
+        type: string
+        default: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCy6vqD9nGJMnam1du6NfXVW3EAw4mmOSRpg1MIPLziBlYVQjFbpcZe/42Vl1d4QrBY2L0Hx6Q5zOKqEFm+uREec3iP9y15WFxXkRZibHzjCKa+TNvNeHT6aLa9MgXTEitk/ozRvd3cygyXo6AnbEtQj7ejc1JHpxPfm68dM/djhHiXK1UnWzMVQgdLAGRPxZ8CNbWqnkZ+GHS3GlN50NFNyTTfJox5cTKMUXvHZFnDkxLHwQ24yKZAEk/O/1Beu3/ZJCyQgJz0XdfSm3XKpC6BmooW7SNY3BSESRnSvgiJ/NANkJPZ1BQtKfZz2PULuYADWPJfYdbqThXLEf1Gort0WoNCVEB81sPU1jez6XtEc2SVQBbgnz9svcfT66179+Tc00PFwY4DEtOTr02yrGjfOVocdDDXG8imJXGZjh77jpuvvrGV9GdzxK91v+LZtifB9uQEHRPMNtIBpvRjzW6a9nUPIHy48+JIstGyRBgG97rm28XwG0+3rdS/HneFFxE="
+  - title: Choose a location
+    required:
+    - repoUrl
+    properties:
+      repoUrl:
+        title: Repository Location
+        type: string
+        ui:field: RepoUrlPicker
+        ui:options:
+          allowedHosts:
+          - github.com
+  steps:
+  - id: pulumi-new-component
+    name: Create new Pulumi component
+    action: pulumi:new
+    input:
+      name: ${{parameters.name}}
+      description: ${{parameters.description}}
+      stack: ${{parameters.stack}}
+      organization: ${{parameters.organization}}
+      template: "kubernetes-azure-${{parameters.language}}"
+      folder: .
+      config:
+        "azure-native:location": "westeurope"
+        "numWorkerNodes": ${{parameters.numWorkerNodes}}
+        "kubernetesVersion": ${{parameters.kubernetesVersion}}
+        "nodeVmSize": ${{parameters.nodeVmSize}}
+        "sshPubKey": ${{parameters.sshPubKey  | trim }}
+        "mgmtGroupId": "5f00ca07-e479-4a13-be19-3f03823adfd7"
+
+  - id: pulumi-deploy-infrastructure
+    name: Deploy the infrastructure using Pulumi CLI
+    action: pulumi:up
+    input:
+      deployment: false
+      name: ${{ parameters.name }}
+      repoUrl: "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
+      repoProjectPath: .
+      organization: ${{parameters.organization}}
+      outputs:
+      - kubeconfig
+      stack: ${{ parameters.stack }}
+
+  - id: template
+    name: Render the Backstage template
+    action: fetch:template
+    input:
+      url: ./template
+      values:
+        name: "${{ parameters.name }}"
+        description: ${{ parameters.description }}
+        destination: ${{ parameters.repoUrl | parseRepoUrl }}
+        organization: ${{parameters.organization}}
+        stack: ${{ parameters.stack }}
+        owner: ${{ parameters.owner }}
+        system: ${{ parameters.system }}
+
+  - id: publish
+    name: Publish to GitHub
+    action: publish:github
+    input:
+      allowedHosts: ["github.com"]
+      repoVisibility: public
+      description: "This repository contains the infrastructure code for the ${{ parameters.name }} component"
+      repoUrl: ${{ parameters.repoUrl }}
+      defaultBranch: main
+      requiredApprovingReviewCount: 0
+      protectDefaultBranch: false
+
+  - id: wait
+    name: Wait for the repository to be created
+    action: debug:wait
+    input:
+      seconds: 15
+
+  - id: register
+    name: Registering the Catalog Info Component
+    action: catalog:register
+    input:
+      repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+      catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+    - title: Open the Source Code Repository
+      url: ${{ steps['publish'].output.repoContentsUrl }}
+    - title: Open the Catalog Info Component
+      icon: catalog
+      entityRef: ${{ steps['register'].output.entityRef }}

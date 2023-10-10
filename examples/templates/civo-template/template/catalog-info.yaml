@@ -1,0 +1,31 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ${{values.name}}
+  description: The Kubernetes cluster for the ${{values.stack}}
+  links:
+    - title: Pulumi Console
+      url: https://app.pulumi.com/${{values.organization}}/${{values.name}}/${{values.stack}}
+spec:
+  type: kubernetes
+  owner: ${{values.owner | dump}}
+  lifecycle: experimental
+  system: ${{values.system}}
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.name}}
+  {%- if values.description %}
+  description: ${{values.description | dump}}
+  {%- endif %}
+  annotations:
+    github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
+    pulumi.com/project-slug: ${{values.organization + "/" + values.name + "/" + values.stack}}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{values.owner | dump}}
+  system: ${{values.system}}
+  dependsOn:
+    - resource:default/${{values.name}}
