@@ -1,10 +1,8 @@
 import {
-    createTemplateAction
+    createTemplateAction,
+    executeShellCommand,
 } from "@backstage/plugin-scaffolder-node";
 
-import {
-    executeShellCommand,
-} from '@backstage/plugin-scaffolder-backend';
 import commonPulumiConfig from "../commonPulumiConfig";
 import {z} from "zod";
 
