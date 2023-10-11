@@ -22,19 +22,19 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/errors": "^1.2.1",
-    "@backstage/integration": "^1.5.1",
-    "@backstage/plugin-scaffolder-backend": "^1.15.1",
-    "@backstage/plugin-scaffolder-node": "^0.1.5",
+    "@backstage/errors": "^1.2.2",
+    "@backstage/integration": "^1.7.0",
+    "@backstage/plugin-scaffolder-backend": "^1.17.3",
+    "@backstage/plugin-scaffolder-node": "^0.2.5",
     "@backstage/types": "^1.1.0",
-    "@pulumi/pulumi": "^3.77.1",
+    "@pulumi/pulumi": "^3.88.0",
     "@types/node": "*",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@backstage/backend-common": "^0.19.0",
+    "@backstage/backend-common": "^0.19.7",
     "@backstage/cli": "^0.22.13",
-    "typescript": "~5.0.0"
+    "typescript": "~5.2.2"
   },
   "files": [
     "LICENSE",

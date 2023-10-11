@@ -19,14 +19,24 @@ This repository contains the following Backstage plugins and modules:
 #### Pulumi CLI
 You need to have the Pulumi CLI installed on the Backstage server.
 
-If you use the Backstage Dockerfile, add following lines after the `FROM` line:
+If you use the Backstage Dockerfile, add following lines before the `USER node` line:
+
+```Dockerfile
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y --no-install-recommends curl ca-certificates
+```
+
+and add following lines after the `USER node` line:
 
 ```Dockerfile
 RUN <<EOF
 ## Install pulumi and set to PATH
 curl -fsSL https://get.pulumi.com | sh
-PATH="/root/.pulumi/bin:${PATH}"
 EOF
+
+ENV PATH="/node/.pulumi/bin:${PATH}"
 ````
 
 This will install the latest Pulumi CLI to your Backstage container.

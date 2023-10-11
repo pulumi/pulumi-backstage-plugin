@@ -37,7 +37,7 @@ export function pulumiUpAction() {
             },
             async handler(ctx) {
                 ctx.logger.info('Running pulumi up...');
-                ctx.logger.info('Working directory: ${ctx.workspacePath}');
+                ctx.logger.info(`Working directory: ${ctx.workspacePath}`);
 
                 if (!ctx.input.deployment) {
                     const stackName = fullyQualifiedStackName(ctx.input.organization, ctx.input.name, ctx.input.stack);
