@@ -214,11 +214,11 @@ spec:
 
 #### Pulumi Card (System Overview)
 
-<img src="plugins/backstage-plugin-pulumi/doc/doc/system.png" width="500">
+<img src="plugins/backstage-plugin-pulumi/doc/system.png" width="500">
 
 #### Pulumi Activity View
 
-<img src="plugins/backstage-plugin-pulumi/doc/doc/activity.png" width="500">
+<img src="plugins/backstage-plugin-pulumi/doc/activity.png" width="500">
 
 ### Support
 
