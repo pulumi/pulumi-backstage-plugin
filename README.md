@@ -17,6 +17,7 @@ This repository contains the following Backstage plugins and modules:
 ### Requirements
 
 #### Pulumi CLI
+
 You need to have the Pulumi CLI installed on the Backstage server.
 
 If you use the Backstage Dockerfile, add following lines before the `USER node` line:
@@ -43,11 +44,13 @@ This will install the latest Pulumi CLI to your Backstage container.
 
 #### Pulumi Personal Access Token (PAT)
 
-To authenticate to the Pulumi cloud service, you need to provide additionally the Pulumi Personal Access Token via the environment variable `PULUMI_ACCESS_TOKEN``
+To authenticate to the Pulumi cloud service, you need to provide additionally the Pulumi Personal Access Token via the
+environment variable `PULUMI_ACCESS_TOKEN``
 
 #### Programming languages runtimes
 
-If you not going to use the [Pulumi Deployment](https://www.pulumi.com/docs/pulumi-cloud/deployments/) service, you need to be sure that all the programming language runtimes are installed on your Backstage service
+If you're not going to use the [Pulumi Deployment](https://www.pulumi.com/docs/pulumi-cloud/deployments/) service, you need
+to be sure that all the programming language runtimes are installed on your Backstage service
 
 ### Getting Started
 
@@ -125,22 +128,22 @@ metadata:
   description: |
     A template for creating a new Kubernetes Cluster.
   tags:
-    - pulumi
-    - kubernetes
+  - pulumi
+  - kubernetes
 spec:
   steps:
-    - id: pulumi-new-component
-      name: Cookie cut the component Pulumi project
-      action: pulumi:new
-      input:
-        name: "${{ parameters.component_id }}-infrastructure"
-        description: ${{ parameters.description | dump }}
-        organization: ediri
-        stack: ${{ parameters.stack }}
-        template: "https://github.com/my-silly-organisation/microservice-civo/tree/main/infrastructure-${{ parameters.cloud }}-${{ parameters.language }}"
-        config:
-          "node:node_count": "${{ parameters.nodeCount }}"
-        folder: .
+  - id: pulumi-new-component
+    name: Cookie cut the component Pulumi project
+    action: pulumi:new
+    input:
+      name: "${{ parameters.component_id }}-infrastructure"
+      description: ${{ parameters.description | dump }}
+      organization: ediri
+      stack: ${{ parameters.stack }}
+      template: "https://github.com/my-silly-organisation/microservice-civo/tree/main/infrastructure-${{ parameters.cloud }}-${{ parameters.language }}"
+      config:
+        "node:node_count": "${{ parameters.nodeCount }}"
+      folder: .
 ```
 
 ### Pulumi Up Action
@@ -162,6 +165,7 @@ The Pulumi Up Action is a custom action that allows you to run the `pulumi up` c
 | repoBranch                 | The Pulumi project repo branch to use, when using Pulumi Deployment | string        | No       |
 | repoProjectPath            | The Pulumi project repo path to use, when using Pulumi Deployment   | string        | No       |
 | providerCredentialsFromEnv | The Pulumi project provider credentials to use                      | array(string) | No       |
+| preRunCommands             | The Pulumi project pre-run commands to run                          | array(string) | No       |
 
 The action offers also Pulumi deployment support, to use it you need to set the `deployment` input to `true`. If you did
 not set any `config` or `secretConfig`, during the `pulumi:new` action, you need to set them here. If you have any
@@ -176,24 +180,29 @@ metadata:
   description: |
     A template for creating a new Kubernetes Cluster.
   tags:
-    - pulumi
-    - kubernetes
+  - pulumi
+  - kubernetes
 spec:
   steps:
-    - id: pulumi-deploy-infrastructure
-      name: Deploy the infrastructure using Pulumi CLI
-      action: pulumi:up
-      input:
-        deployment: false
-        name: "${{ parameters.component_id }}-infrastructure"
-        repoUrl: "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
-        repoProjectPath: .
-        organization: ediri
-        outputs:
-          - kubeconfig
-          - ClusterId
-        stack: ${{ parameters.stack }}
+  - id: pulumi-deploy-infrastructure
+    name: Deploy the infrastructure using Pulumi CLI
+    action: pulumi:up
+    input:
+      deployment: false
+      name: "${{ parameters.component_id }}-infrastructure"
+      repoUrl: "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
+      repoProjectPath: .
+      organization: ediri
+      outputs:
+      - kubeconfig
+      - ClusterId
+      stack: ${{ parameters.stack }}
 ```
+
+> [!NOTE]
+> If you run `pulumi:up` via CLI and with a local Pulumi template you may need to install the required dependencies for
+> the Pulumi SDK to work. This can now be done via the `preRunCommands` input.
+> For example for a node based Pulumi project you need to run `npm install` before running `pulumi up`.
 
 ## Pulumi Plugin
 
@@ -304,14 +313,15 @@ First, annotate your component/resource entity with the following:
 
 ```yaml
 annotations:
-  pulumi.com/project-slug: [ Pulumi Cloud Name: org/stackname/stack ]
+  pulumi.com/project-slug: [Pulumi Cloud Name: org/stackname/stack]
 ```
 
 And your system entity with the following:
 
 ```yaml
 annotations:
-  pulumi.com/orga-slug: <Pulumi Cloud: org>
+  pulumi.com/orga-slug:
+    <Pulumi Cloud: org>
 ```
 
 Next, provide the API token that the client will use to make requests to the Pulumi Cloud API.
@@ -340,7 +350,8 @@ This will proxy the request by adding an `Authorization` header with the provide
 
 #### How to Uninstall
 
-1. Remove any configuration added in Backstage yaml files, such as the proxy configuration in `app-config.yaml` and the integration key in an entity's annotations.
+1. Remove any configuration added in Backstage yaml files, such as the proxy configuration in `app-config.yaml` and the
+   integration key in an entity's annotations.
 1. Remove the added code snippets from `EntityPage.tsx`
 1. Remove the plugin package:
 

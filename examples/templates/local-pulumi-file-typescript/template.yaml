@@ -1,0 +1,118 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: local-pulumi-file-typescript
+  title: Test the Pre Run Command of Pulumi New Action
+  description: |
+    A template to test the pre run command of the pulumi new action
+  tags:
+  - pulumi
+spec:
+  owner: user:guest
+  type: infrastructure
+  parameters:
+  - title: Provide project information
+    required:
+    - name
+    - owner
+    properties:
+      name:
+        title: Name
+        type: string
+        description: Unique name of the Pulumi project.
+        ui:
+          field: EntityNamePicker
+      description:
+        title: Description
+        type: string
+        description: Tell us more about this project.
+      system:
+        title: System
+        type: string
+        description: System this component belongs to.
+        ui:field: EntityPicker
+        ui:options:
+          catalogFilter:
+            kind:
+            - System
+      owner:
+        title: Owner
+        type: string
+        description: Owner of the component
+        ui:field: OwnerPicker
+        ui:options:
+          allowedKinds:
+          - Group
+  - title: Configure Pulumi template
+    required:
+    - stack
+    - organization
+    properties:
+      organization:
+        title: Organization
+        type: string
+        description: The Pulumi organization to use for the Pulumi project
+      stack:
+        title: Select stack
+        type: string
+        enum:
+        - dev
+        - staging
+        - prod
+        enumNames:
+        - Development
+        - Staging
+        - Production
+        description: The pulumi stack to use
+  - title: Choose a location
+    required:
+    - repoUrl
+    properties:
+      repoUrl:
+        title: Repository Location
+        type: string
+        ui:field: RepoUrlPicker
+        ui:options:
+          allowedHosts:
+          - github.com
+  steps:
+  - id: fetch-base
+    name: Fetch Base
+    action: fetch:template
+    input:
+      url: ./template
+      values:
+        name: ${{parameters.name}}
+        description: ${{ parameters.description }}
+        destination: ${{ parameters.repoUrl | parseRepoUrl }}
+        organization: ${{parameters.organization}}
+        stack: ${{ parameters.stack }}
+        owner: ${{ parameters.owner }}
+        system: ${{ parameters.system }}
+
+  - id: wait
+    name: Wait for template to be fetched
+    action: debug:wait
+    input:
+      seconds: 10
+
+  - id: pulumi-deploy-infrastructure
+    name: Deploy the infrastructure using Pulumi CLI
+    action: pulumi:up
+    input:
+      deployment: false
+      preRunCommands:
+      - "npm install"
+      - "npm fund --json"
+      name: ${{ parameters.name }}
+      repoUrl: "https://github.com/${{ (parameters.repoUrl | parseRepoUrl)['owner'] }}/${{ (parameters.repoUrl | parseRepoUrl)['repo'] }}"
+      repoProjectPath: .
+      organization: ${{parameters.organization}}
+      outputs:
+      - helloMessage
+      stack: ${{ parameters.stack }}
+  output:
+    text:
+    - title: Hello Message
+      content: |
+        `${{ steps['pulumi-deploy-infrastructure'].output.helloMessage }}`

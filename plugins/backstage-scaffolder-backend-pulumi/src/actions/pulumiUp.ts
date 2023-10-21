@@ -1,4 +1,4 @@
-import {createTemplateAction} from "@backstage/plugin-scaffolder-node";
+import {createTemplateAction, executeShellCommand} from "@backstage/plugin-scaffolder-node";
 import {RemoteWorkspace, fullyQualifiedStackName, LocalWorkspace} from "@pulumi/pulumi/automation";
 import {InputError} from '@backstage/errors';
 import commonPulumiConfig from "../commonPulumiConfig";
@@ -17,6 +17,7 @@ export function pulumiUpAction() {
         providerCredentialsFromEnv: string[];
         secretConfig: object;
         outputs: string[];
+        preRunCommands: string[];
     }>({
             id: 'pulumi:up',
             description: 'Runs Pulumi',
@@ -31,6 +32,7 @@ export function pulumiUpAction() {
                         repoBranch: z.string({description: 'The Pulumi project repo branch to use, when using Pulumi Deployment'}).optional(),
                         repoProjectPath: z.string({description: 'The Pulumi project repo path to use, when using Pulumi Deployment'}).optional(),
                         providerCredentialsFromEnv: z.array(z.string(), {description: 'The Pulumi project provider credentials to use'}).optional(),
+                        preRunCommands: z.array(z.string(), {description: 'The Pulumi project pre-run commands to execute'}).optional(),
                     })
                 ),
                 output: z.record(z.union([z.string(), z.number(), z.any()]), {description: 'The Pulumi project outputs to return'}),
@@ -41,6 +43,23 @@ export function pulumiUpAction() {
 
                 if (!ctx.input.deployment) {
                     const stackName = fullyQualifiedStackName(ctx.input.organization, ctx.input.name, ctx.input.stack);
+
+                    // run the pre-run commands
+                    if (ctx.input.preRunCommands) {
+                        for (const command of ctx.input.preRunCommands) {
+                            ctx.logger.info(`Running pre-run command: ${command}`)
+                            var commandParts = command.split(' ');
+                            await executeShellCommand({
+                                command: commandParts[0],
+                                args: commandParts.slice(1),
+                                options: {
+                                    cwd: ctx.workspacePath,
+                                },
+                                logStream: ctx.logStream,
+                            })
+                        }
+                    }
+
                     const s = await LocalWorkspace.createOrSelectStack({
                         stackName: stackName,
                         workDir: `${ctx.workspacePath}/${ctx.input.repoProjectPath}`,
