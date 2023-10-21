@@ -1,6 +1,6 @@
 import React, {ComponentProps, ReactNode} from 'react';
 import {
-    PULUMI_ORGA_SLUG_ANNOTATION, 
+    PULUMI_ORGA_SLUG_ANNOTATION,
     PULUMI_PROJECT_SLUG_ANNOTATION
 } from '../constants';
 import {Entity} from '@backstage/catalog-model';
@@ -35,7 +35,7 @@ type PulumiCardProps = {
     deepLink?: BottomLinkProps
 } & ComponentProps<typeof InfoCard>;
 
-const PulumiCard = ({children,deepLink, ...rest}: PulumiCardProps) => (
+const PulumiCard = ({children, deepLink, ...rest}: PulumiCardProps) => (
     <InfoCard deepLink={deepLink} {...rest}>
         <CardHeader title="Pulumi"
                     avatar={
@@ -54,7 +54,7 @@ export const isPluginApplicableToEntity = (entity: Entity) =>
         entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ||
         entity.metadata.annotations?.[PULUMI_ORGA_SLUG_ANNOTATION]
     );
-    
+
 export const EntityPulumiMetdataCard = () => {
 
     const {entity} = useEntity();
@@ -68,9 +68,9 @@ export const EntityPulumiMetdataCard = () => {
     } = useAsync(async () => {
         const organization = await api.getMetadata(orgName ?? '');
 
-        const packages = await api.getDasboard(orgName ?? '', 'package',5);
-    
-        return  {
+        const packages = await api.getDasboard(orgName ?? '', 'package', 5);
+
+        return {
             dashboard: packages,
             metadata: organization,
         };
@@ -118,17 +118,17 @@ export const EntityPulumiMetdataCard = () => {
 
     const metadata = systemCard?.dashboard.aggregations?.package.results.reduce(
         (acc, result) => {
-          acc[result.name] = result.count;
-          return acc;
+            acc[result.name] = result.count;
+            return acc;
         },
         {} as Record<string, number>
-      ) || {} as Record<string, number>;
-      // add the "Other" category
-    metadata['Other'] = systemCard?.dashboard.aggregations?.package.others || 0;
+    ) || {} as Record<string, number>;
+    // add the "Other" category
+    metadata.Other = systemCard?.dashboard.aggregations?.package.others || 0;
 
 
     return (
-        <PulumiCard deepLink={{title:"Dashboard",link:`https://app.pulumi.com/${orgName}/`}}>
+        <PulumiCard deepLink={{title: "Dashboard", link: `https://app.pulumi.com/${orgName}/`}}>
             <CardContent>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -141,24 +141,25 @@ export const EntityPulumiMetdataCard = () => {
                                 product: systemCard?.metadata.product,
                                 subscriptionStatus: systemCard?.metadata.subscriptionStatus,
                             }
-                            }/>   
+                            }/>
                     </Grid>
                     <Grid item xs={12}>
-                        <Accordion TransitionProps={{ unmountOnExit: true }}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} title='sd' >
+                        <Accordion TransitionProps={{unmountOnExit: true}}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon/>} title='sd'>
                                 <Cloud style={{fontSize: 40}}/>
-                                <Typography variant="h6" style={{marginTop: 5, marginLeft: 5}}>Resources by provider</Typography>
+                                <Typography variant="h6" style={{marginTop: 5, marginLeft: 5}}>Resources by
+                                    provider</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Grid item xs={12}>
-                                <StructuredMetadataTable
+                                    <StructuredMetadataTable
                                         dense
                                         metadata={metadata ? metadata : {}}/>
                                 </Grid>
                             </AccordionDetails>
                         </Accordion>
                     </Grid>
-                    
+
                 </Grid>
             </CardContent>
         </PulumiCard>
@@ -166,11 +167,10 @@ export const EntityPulumiMetdataCard = () => {
 };
 
 
-
 export const EntityPulumiCard = () => {
     const {entity} = useEntity();
     const api = useApi(pulumiApiRef);
-    
+
     const {
         value: stack,
         loading,
@@ -178,8 +178,8 @@ export const EntityPulumiCard = () => {
     } = useAsync(async () => {
         const stacks = await api.getStack(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '');
 
-        const project = await api.getProjectDetails(stacks.orgName,stacks.projectName)
-        return  {
+        const project = await api.getProjectDetails(stacks.orgName, stacks.projectName)
+        return {
             stack: stacks,
             project: project,
         };
@@ -232,7 +232,10 @@ export const EntityPulumiCard = () => {
     }
 
     return (
-        <PulumiCard deepLink={{title:"Pulumi Console",link:`https://app.pulumi.com/${stack?.stack.orgName}/${stack?.stack.projectName}/${stack?.stack.stackName}`}}>
+        <PulumiCard deepLink={{
+            title: "Pulumi Console",
+            link: `https://app.pulumi.com/${stack?.stack.orgName}/${stack?.stack.projectName}/${stack?.stack.stackName}`
+        }}>
             <CardContent>
                 <StructuredMetadataTable
                     dense

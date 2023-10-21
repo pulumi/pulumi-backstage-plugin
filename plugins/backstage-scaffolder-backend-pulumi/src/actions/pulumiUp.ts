@@ -48,7 +48,7 @@ export function pulumiUpAction() {
                     if (ctx.input.preRunCommands) {
                         for (const command of ctx.input.preRunCommands) {
                             ctx.logger.info(`Running pre-run command: ${command}`)
-                            var commandParts = command.split(' ');
+                            const commandParts = command.split(' ');
                             await executeShellCommand({
                                 command: commandParts[0],
                                 args: commandParts.slice(1),
