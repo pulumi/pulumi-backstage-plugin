@@ -52,7 +52,8 @@
   },
   "files": [
     "LICENSE",
-    "dist"
+    "dist",
+    "doc"
   ],
   "resolutions": {
     "@types/react": "^17.0.39",
