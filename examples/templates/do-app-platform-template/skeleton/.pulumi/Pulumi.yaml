@@ -1,0 +1,11 @@
+name: ${{values.name}}
+runtime: go
+description: A minimal DigitalOcean Go Pulumi program
+
+config:
+  appName: ${{values.name}}
+  region: fra1
+  repoCloneUrl: ${{values.repoCloneUrl}}
+  branch: main
+  instanceCount: 1
+  instanceSize: basic-xs
