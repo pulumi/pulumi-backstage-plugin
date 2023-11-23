@@ -11,5 +11,6 @@ spec:
   #- ./templates/gke-template/template.yaml
   #- ./templates/aks-template/template.yaml
   #- ./templates/civo-template/template.yaml
-  - ./templates/local-pulumi-file-typescript/template.yaml
+  #- ./templates/local-pulumi-file-typescript/template.yaml
   - ./templates/microservice-kubernetes-template/template.yaml
+  - ./templates/do-app-platform-template/template.yaml
