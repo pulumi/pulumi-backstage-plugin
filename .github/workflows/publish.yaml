@@ -7,8 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        # get all the tags from git
+      with: # get all the tags from git
         fetch-depth: 0
     - uses: actions/setup-node@v3
       with:
@@ -24,6 +23,15 @@ jobs:
         cd ..
         
         cd backstage-scaffolder-backend-pulumi
+        yarn install --frozen-lockfile
+        
+        # copy over the example npmrc file and publish
+        cp ../../hack/.npmrc.example .npmrc
+        cp ../../hack/publish.sh publish.sh
+        ./publish.sh
+        cd ..
+        
+        cd catalog-backend-module-pulumi
         yarn install --frozen-lockfile
         
         # copy over the example npmrc file and publish
