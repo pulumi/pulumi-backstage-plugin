@@ -38,6 +38,7 @@
     "@backstage/plugin-search-backend-node": "^1.2.11",
     "@backstage/plugin-techdocs-backend": "^1.9.0",
     "@pulumi/backstage-scaffolder-backend-pulumi": "^0.1.0",
+    "@pulumi/plugin-catalog-backend-module-pulumi": "^0.1.0",
     "app": "link:../app",
     "better-sqlite3": "^9.0.0",
     "dockerode": "^3.3.1",
