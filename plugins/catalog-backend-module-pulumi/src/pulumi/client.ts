@@ -22,11 +22,11 @@ async function fetchFromPulumi(url: string, config: PulumiProviderConfig, logger
 export async function getStacks(config: PulumiProviderConfig, logger: Logger): Promise<Stacks> {
     const organisationUrl = `${config.api}/api/user/stacks?organization=${config.organization}`;
     const response = await fetchFromPulumi(organisationUrl, config, logger);
-    return response.json();
+    return await response.json() as Stacks;
 }
 
 export async function getStack(config: PulumiProviderConfig, logger: Logger, orgName: string, projectName: string, stackName: string): Promise<StackDetail> {
     const stackUrl = `${config.api}/api/stacks/${orgName}/${projectName}/${stackName}`;
     const response = await fetchFromPulumi(stackUrl, config, logger);
-    return response.json();
+    return await response.json() as StackDetail;
 }
