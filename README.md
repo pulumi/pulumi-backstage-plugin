@@ -11,6 +11,7 @@ This repository contains the following Backstage plugins and modules:
 
 - [Pulumi Scaffolder Backend Module](#pulumi-scaffolder-backend-module)
 - [Pulumi Plugin](#pulumi-plugin)
+- [Catalog Backend Module for Pulumi](#catalog-backend-module-for-pulumi)
 
 ## Pulumi Scaffolder Backend Module
 
