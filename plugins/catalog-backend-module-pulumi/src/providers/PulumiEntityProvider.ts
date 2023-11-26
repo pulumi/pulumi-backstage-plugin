@@ -32,7 +32,6 @@ import {defaultResourceTransformer} from "../pulumi/transformes";
 /** @public */
 export class PulumiEntityProvider implements EntityProvider {
     private readonly config: PulumiProviderConfig;
-    //private readonly integration: GerritIntegration;
     private readonly logger: Logger;
     private readonly scheduleFn: () => Promise<void>;
     private connection?: EntityProviderConnection;
