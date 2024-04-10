@@ -9,7 +9,7 @@ support [Pulumi](https://www.pulumi.com/).
 > This is a work in progress and happy to receive feedback and contributions.
 
 > [!IMPORTANT]   
-> The Pulumi Scaffolder Backend Module and the Pulumi Catalog Backend Module in version `v0.6.0` are now supporting
+> The Pulumi Scaffolder Backend Module and the Pulumi Catalog Backend Module in version > `v0.6.0` are now supporting
 > the new [Backstage Backend System](https://backstage.io/docs/backend-system/building-backends/index).
 
 This repository contains the following Backstage plugins and modules:
