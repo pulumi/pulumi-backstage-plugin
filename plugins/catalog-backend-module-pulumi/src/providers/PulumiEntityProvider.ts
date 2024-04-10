@@ -5,6 +5,7 @@ import {
     EntityProviderConnection,
 } from '@backstage/plugin-catalog-node';
 
+// @ts-ignore
 import {merge} from 'lodash';
 import * as uuid from 'uuid';
 import {Logger} from 'winston';
