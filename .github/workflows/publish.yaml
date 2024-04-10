@@ -12,9 +12,10 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '18.x'
+    - run: yarn install
     - run: |
         cd backstage-plugin-pulumi
-        yarn install --frozen-lockfile
+        #yarn install --frozen-lockfile
         
         # copy over the example npmrc file and publish
         cp ../../hack/.npmrc.example .npmrc
@@ -23,7 +24,7 @@ jobs:
         cd ..
         
         cd backstage-scaffolder-backend-pulumi
-        yarn install --frozen-lockfile
+        #yarn install --frozen-lockfile
         
         # copy over the example npmrc file and publish
         cp ../../hack/.npmrc.example .npmrc
@@ -32,7 +33,7 @@ jobs:
         cd ..
         
         cd catalog-backend-module-pulumi
-        yarn install --frozen-lockfile
+        #yarn install --frozen-lockfile
         
         # copy over the example npmrc file and publish
         cp ../../hack/.npmrc.example .npmrc
