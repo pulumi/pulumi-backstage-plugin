@@ -36,6 +36,7 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
+    "@backstage/backend-plugin-api": "^0.6.16",
     "@backstage/errors": "^1.2.4",
     "@backstage/integration": "^1.9.1",
     "@backstage/plugin-scaffolder-backend": "^1.22.3",
