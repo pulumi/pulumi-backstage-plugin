@@ -1,5 +1,4 @@
 import {Logger} from "winston";
-import fetch, {Response} from "node-fetch";
 import {PulumiProviderConfig, StackDetail, Stacks} from "./index";
 
 // Helper function for fetch requests

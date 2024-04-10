@@ -1,3 +1,4 @@
+import { TaskScheduleDefinitionConfig } from '@backstage/backend-tasks';
 export interface Config {
     catalog?: {
         /**
@@ -23,6 +24,10 @@ export interface Config {
                      * (Required) The Pulumi Access Token to use.
                      */
                     pulumiAccessToken: string;
+                    /**
+                     * (Optional) TaskScheduleDefinition for the refresh.
+                     */
+                    schedule?: TaskScheduleDefinitionConfig;
                 };
             };
         };

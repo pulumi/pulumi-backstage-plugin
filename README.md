@@ -5,7 +5,12 @@
 This repository contains plugins and modules for [Backstage](https://backstage.io/) to
 support [Pulumi](https://www.pulumi.com/).
 
-> **NOTE:** This is a work in progress and happy to receive feedback and contributions.
+> [!NOTE]  
+> This is a work in progress and happy to receive feedback and contributions.
+
+> [!IMPORTANT]   
+> The Pulumi Scaffolder Backend Module and the Pulumi Catalog Backend Module in version `v0.6.0` are now supporting
+> the new [Backstage Backend System](https://backstage.io/docs/backend-system/building-backends/index).
 
 This repository contains the following Backstage plugins and modules:
 
@@ -69,33 +74,9 @@ the [docs](https://backstage.io/docs/features/software-templates/writing-custom-
 see all options):
 
 ```typescript
-// packages/backend/src/plugins/scaffolder.ts
-import {
-    pulumiNewAction,
-    pulumiUpAction
-} from '@pulumi/backstage-scaffolder-backend-pulumi';
-
-const actions = [
-    pulumiNewAction(),
-    pulumiUpAction(),
-    ...createBuiltinActions({
-        integrations,
-        catalogClient,
-        config: env.config,
-        reader: env.reader,
-    })
-]
-
-return await createRouter({
-    actions,
-    logger: env.logger,
-    config: env.config,
-    database: env.database,
-    reader: env.reader,
-    catalogClient,
-    identity: env.identity,
-    permissions: env.permissions,
-});
+// packages/backend/src/index.ts
+const backend = createBackend();
+backend.add(import('@pulumi/backstage-scaffolder-backend-pulumi'));
 ```
 
 ### PULUMI_ACCESS_TOKEN
@@ -379,23 +360,8 @@ yarn add --cwd packages/backend @pulumi/plugin-catalog-backend-module-pulumi
 Update the catalog plugin initialization in your backend to add the provider and schedule it:
 
 ```typescript
-import {PulumiEntityProvider} from '@pulumi/plugin-catalog-backend-module-pulumi';
-
- export default async function createPlugin(
-   env: PluginEnvironment,
- ): Promise<Router> {
-   const builder = await CatalogBuilder.create(env);
-
-  builder.addEntityProvider(
-    PulumiEntityProvider.fromConfig(env.config, {
-      logger: env.logger,
-      schedule: env.scheduler.createScheduledTaskRunner({
-        frequency: { minutes: 10 },
-        timeout: { minutes: 50 },
-        initialDelay: { seconds: 15 }
-      }),
-    })
-  );
+//packages/backend/src/index.ts
+backend.add(import('@pulumi/plugin-catalog-backend-module-pulumi/alpha'));
 ```
 
 After this, you also have to add some configuration in your app-config that describes what you want to import for that target.
@@ -412,40 +378,7 @@ catalog:
         api: https://api.pulumi.com
         organization: <your organization>
         pulumiAccessToken: ${PULUMI_ACCESS_TOKEN}
-```
-
-### Customize the Provider
-
-The default ingestion behaviour will likely not work for all use cases - you will want to set proper `Owner`, `System` and other fields for the
-ingested resources. In case you want to customize the ingested entities, the provider allows to pass a transformer for resources. Here we will show an example
-of overriding the default transformer.
-
-1. Create a transformer:
-
-```ts
-export const customResourceTransformer: ResourceTransformer = async (
-  stackDetail,
-  _config,
-): Promise<ResourceEntity | undefined> => {
-  // Transformations may change namespace, owner, change entity naming pattern, add labels, annotations, etc.
-
-  // Create the Resource Entity on your own, or wrap the default transformer
-  return await defaultResourceTransformer(stackDetail, config);
-};
-```
-
-1. Configure the provider with the transformer:
-
-```typescript
-  builder.addEntityProvider(
-    PulumiEntityProvider.fromConfig(env.config, {
-      logger: env.logger,
-      transformer: customResourceTransformer,
-      schedule: env.scheduler.createScheduledTaskRunner({
-        frequency: { minutes: 10 },
-        timeout: { minutes: 50 },
-        initialDelay: { seconds: 15 }
-      }),
-    })
-  );
+        schedule:
+          frequency: PT10M
+          timeout: PT50M
 ```

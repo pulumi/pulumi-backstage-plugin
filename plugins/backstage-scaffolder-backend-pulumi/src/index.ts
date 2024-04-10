@@ -6,3 +6,4 @@
 
 export * from './actions/pulumiUp';
 export * from './actions/pulumiNew';
+export { pulumiModule as default } from './module';

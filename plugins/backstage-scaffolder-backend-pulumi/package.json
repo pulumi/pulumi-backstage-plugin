@@ -5,12 +5,26 @@
   "types": "src/index.ts",
   "license": "MPL-2.0",
   "publishConfig": {
-    "access": "public",
-    "main": "dist/index.cjs.js",
-    "types": "dist/index.d.ts"
+    "access": "public"
   },
   "backstage": {
     "role": "backend-plugin-module"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "package.json": [
+        "package.json"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulumi/pulumi-backstage-plugin",
+    "directory": "plugins/backstage-scaffolder-backend-pulumi"
   },
   "scripts": {
     "start": "backstage-cli package start",
@@ -22,18 +36,18 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/errors": "^1.2.3",
-    "@backstage/integration": "^1.9.0",
-    "@backstage/plugin-scaffolder-backend": "^1.21.3",
-    "@backstage/plugin-scaffolder-node": "^0.3.3",
+    "@backstage/errors": "^1.2.4",
+    "@backstage/integration": "^1.9.1",
+    "@backstage/plugin-scaffolder-backend": "^1.22.3",
+    "@backstage/plugin-scaffolder-node": "^0.4.2",
     "@backstage/types": "^1.1.1",
-    "@pulumi/pulumi": "^3.89.0",
+    "@pulumi/pulumi": "^3.112.0",
     "@types/node": "*",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@backstage/backend-common": "^0.21.3",
-    "@backstage/cli": "^0.25.2",
+    "@backstage/backend-common": "^0.21.5",
+    "@backstage/cli": "^0.26.1",
     "typescript": "~5.2.2"
   },
   "files": [
