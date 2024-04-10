@@ -5,6 +5,7 @@ import {
     EntityProviderConnection,
 } from '@backstage/plugin-catalog-node';
 
+// @ts-ignore
 import {merge} from 'lodash';
 import * as uuid from 'uuid';
 import {Logger} from 'winston';
@@ -46,11 +47,10 @@ export class PulumiEntityProvider implements EntityProvider {
             transformer?: ResourceTransformer;
         },
     ): PulumiEntityProvider[] {
+        const providerConfigs = readPulumiConfigs(configRoot);
         if (!options.schedule && !options.scheduler) {
             throw new Error('Either schedule or scheduler must be provided.');
         }
-
-        const providerConfigs = readPulumiConfigs(configRoot);
 
         const providers: PulumiEntityProvider[] = [];
 
@@ -58,7 +58,7 @@ export class PulumiEntityProvider implements EntityProvider {
 
             if (!options.schedule && !providerConfig.schedule) {
                 throw new Error(
-                    `No schedule provided neither via code nor config for gerrit-provider:${providerConfig.id}.`,
+                    `No schedule provided neither via code nor config for pulumi-entity-provider:${providerConfig.id}.`,
                 );
             }
 

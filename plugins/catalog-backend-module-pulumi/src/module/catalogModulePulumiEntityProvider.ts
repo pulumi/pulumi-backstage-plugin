@@ -9,7 +9,7 @@ import {PulumiEntityProvider} from '../providers/PulumiEntityProvider';
 
 export const catalogModulePulumiEntityProvider = createBackendModule({
     pluginId: 'catalog',
-    moduleId: 'PulumiEntityProvider',
+    moduleId: 'pulumi-entity-provider',
     register(env) {
         env.registerInit({
             deps: {
