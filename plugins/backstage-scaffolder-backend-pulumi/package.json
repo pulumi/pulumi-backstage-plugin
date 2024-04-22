@@ -36,19 +36,19 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "^0.6.16",
+    "@backstage/backend-plugin-api": "^0.6.17",
     "@backstage/errors": "^1.2.4",
-    "@backstage/integration": "^1.9.1",
-    "@backstage/plugin-scaffolder-backend": "^1.22.3",
-    "@backstage/plugin-scaffolder-node": "^0.4.2",
+    "@backstage/integration": "^1.10.0",
+    "@backstage/plugin-scaffolder-backend": "^1.22.4",
+    "@backstage/plugin-scaffolder-node": "^0.4.3",
     "@backstage/types": "^1.1.1",
     "@pulumi/pulumi": "^3.112.0",
     "@types/node": "*",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@backstage/backend-common": "^0.21.6",
-    "@backstage/cli": "^0.26.2",
+    "@backstage/backend-common": "^0.21.7",
+    "@backstage/cli": "^0.26.4",
     "typescript": "~5.2.2"
   },
   "files": [
