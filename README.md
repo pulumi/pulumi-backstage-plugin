@@ -148,6 +148,7 @@ The Pulumi Up Action is a custom action that allows you to run the `pulumi up` c
 | repoProjectPath            | The Pulumi project repo path to use, when using Pulumi Deployment   | string        | No       |
 | providerCredentialsFromEnv | The Pulumi project provider credentials to use                      | array(string) | No       |
 | preRunCommands             | The Pulumi project pre-run commands to run                          | array(string) | No       |
+| suppressProgress           | Suppress progress output                                            | boolean       | No       |
 
 The action offers also Pulumi deployment support, to use it you need to set the `deployment` input to `true`. If you did
 not set any `config` or `secretConfig`, during the `pulumi:new` action, you need to set them here. If you have any
