@@ -1,5 +1,5 @@
 import {createTemplateAction, executeShellCommand} from "@backstage/plugin-scaffolder-node";
-import {RemoteWorkspace, fullyQualifiedStackName, LocalWorkspace} from "@pulumi/pulumi/automation";
+import {fullyQualifiedStackName, LocalWorkspace, RemoteWorkspace} from "@pulumi/pulumi/automation";
 import {InputError} from '@backstage/errors';
 import commonPulumiConfig from "../commonPulumiConfig";
 import {z} from "zod";
@@ -18,6 +18,7 @@ export function pulumiUpAction() {
         secretConfig: object;
         outputs: string[];
         preRunCommands: string[];
+        suppressProgress: boolean;
     }>({
             id: 'pulumi:up',
             description: 'Runs Pulumi',
@@ -33,6 +34,7 @@ export function pulumiUpAction() {
                         repoProjectPath: z.string({description: 'The Pulumi project repo path to use, when using Pulumi Deployment'}).optional(),
                         providerCredentialsFromEnv: z.array(z.string(), {description: 'The Pulumi project provider credentials to use'}).optional(),
                         preRunCommands: z.array(z.string(), {description: 'The Pulumi project pre-run commands to execute'}).optional(),
+                        suppressProgress: z.boolean({description: 'Suppress progress output'}).default(true).optional(),
                     })
                 ),
                 output: z.record(z.union([z.string(), z.number(), z.any()]), {description: 'The Pulumi project outputs to return'}),
@@ -67,11 +69,11 @@ export function pulumiUpAction() {
 
                     ctx.logger.info(`Successfully initialized stack ${s.name}`)
                     ctx.logger.info(`Refreshing stack ${s.name}...`)
-                    await s.refresh({onOutput: ctx.logger.info})
+                    await s.refresh({onOutput: ctx.logger.info, suppressProgress: ctx.input.suppressProgress})
                     ctx.logger.info(`Successfully refreshed stack ${s.name}`)
 
                     ctx.logger.info(`Updating stack ${s.name}...`)
-                    const up = await s.up({onOutput: ctx.logger.info, showSecrets: true})
+                    const up = await s.up({onOutput: ctx.logger.info, showSecrets: true, suppressProgress: ctx.input.suppressProgress})
                     ctx.logger.info(`update summary: ${JSON.stringify(up.summary.resourceChanges, null, 4)}`)
                     for (const output of ctx.input.outputs) {
                         ctx.output(output, up.outputs[output].value)
@@ -112,7 +114,7 @@ export function pulumiUpAction() {
                     })
                     ctx.logger.info(`Successfully initialized stack ${remoteStack.name}`)
                     ctx.logger.info(`Refreshing stack ${remoteStack.name}...`)
-                    await remoteStack.refresh({onOutput: ctx.logger.info})
+                    await remoteStack.refresh({onOutput: ctx.logger.info,})
                     ctx.logger.info(`Successfully refreshed stack ${remoteStack.name}`)
 
                     ctx.logger.info(`Updating stack ${remoteStack.name}...`)
