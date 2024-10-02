@@ -18,6 +18,8 @@ cat ../../.yarnrc.yml
 
 jq --arg new_version "$STRIPPED_NEW_VERSION" '.version = $new_version' package.json > tmp.json && mv tmp.json package.json
 
+sleep 5
+
 yarn clean
 yarn tsc
 yarn build
