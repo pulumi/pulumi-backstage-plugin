@@ -23,6 +23,6 @@ yarn tsc
 yarn build
 
 # don't git commit or push
-yarn npm publish --tag $STRIPPED_NEW_VERSION --access public #--new-version $STRIPPED_NEW_VERSION --no-git-tag-version
+yarn npm publish --tag latest --access public #--new-version $STRIPPED_NEW_VERSION --no-git-tag-version
 
 yq eval 'del(.npmAuthToken)' -i ../../.yarnrc.yml
