@@ -1,7 +1,7 @@
 **/node_modules
 **/dist
 **/dist-types
-**/yarn.lock
+#**/yarn.lock
 **/package-lock.json
 **/pulumi-backstage-*.tgz
 # macOS
