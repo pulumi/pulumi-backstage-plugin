@@ -12,6 +12,10 @@ NEW_VERSION=$(git describe --always --tags --match "v*")
 # e.g. 0.6.0
 STRIPPED_NEW_VERSION=$(echo $NEW_VERSION | sed -e 's/^v//')
 
+echo "npmAuthToken: $NPM_TOKEN" >> ../../.yarnrc.yml
+
+cat ../../.yarnrc.yml
+
 yarn clean
 yarn tsc
 yarn build
