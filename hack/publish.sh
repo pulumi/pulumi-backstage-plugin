@@ -18,11 +18,11 @@ cat ../../.yarnrc.yml
 
 jq --arg new_version "$STRIPPED_NEW_VERSION" '.version = $new_version' package.json > tmp.json && mv tmp.json package.json
 
-cat package.json
-
 yarn clean
 yarn tsc
 yarn build
 
 # don't git commit or push
 yarn npm publish --tag $STRIPPED_NEW_VERSION --access public #--new-version $STRIPPED_NEW_VERSION --no-git-tag-version
+
+yq eval 'del(.npmAuthToken)' -i ../../.yarnrc.yml
