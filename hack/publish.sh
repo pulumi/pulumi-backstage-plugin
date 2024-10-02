@@ -16,6 +16,10 @@ echo "npmAuthToken: $NPM_TOKEN" >> ../../.yarnrc.yml
 
 cat ../../.yarnrc.yml
 
+jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > tmp.json && mv tmp.json package.json
+
+cat package.json
+
 yarn clean
 yarn tsc
 yarn build
