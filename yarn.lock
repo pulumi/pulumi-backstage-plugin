@@ -3802,9 +3802,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/plugin-app-backend@npm:^0.3.74":
-  version: 0.3.74
-  resolution: "@backstage/plugin-app-backend@npm:0.3.74"
+"@backstage/plugin-app-backend@npm:^0.3.75":
+  version: 0.3.75
+  resolution: "@backstage/plugin-app-backend@npm:0.3.75"
   dependencies:
     "@backstage/backend-common": "npm:^0.25.0"
     "@backstage/backend-plugin-api": "npm:^1.0.0"
@@ -3824,7 +3824,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     luxon: "npm:^3.0.0"
     yn: "npm:^4.0.0"
-  checksum: 10c0/564cc2488b4a23d38397ceb7cd69ef81de4ebbe70e0d23d8d9eeec35b42a69b4609d09586840246eadb06c057794d9d005f638f5bd4ed2d9615bbaa94b96cb45
+  checksum: 10c0/1414e8fa5bf1fe2b78909c0b43a834e32abb5bb44fdbed61237071131fa1ee8354795a3b48aceb940d85003155c65ad3bb11ec821dd9b89ac9d3103606bde1fa
   languageName: node
   linkType: hard
 
@@ -15138,7 +15138,7 @@ __metadata:
     "@backstage/backend-tasks": "npm:^0.6.1"
     "@backstage/cli": "npm:^0.27.1"
     "@backstage/config": "npm:^1.2.0"
-    "@backstage/plugin-app-backend": "npm:^0.3.74"
+    "@backstage/plugin-app-backend": "npm:^0.3.75"
     "@backstage/plugin-auth-backend": "npm:^0.23.0"
     "@backstage/plugin-auth-backend-module-github-provider": "npm:^0.2.0"
     "@backstage/plugin-auth-backend-module-guest-provider": "npm:^0.2.0"
