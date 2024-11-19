@@ -42,11 +42,11 @@
   },
   "dependencies": {
     "@backstage/backend-common": "^0.25.0",
-    "@backstage/backend-plugin-api": "^1.0.0",
+    "@backstage/backend-plugin-api": "^1.0.1",
     "@backstage/backend-tasks": "^0.6.1",
     "@backstage/catalog-model": "^1.7.0",
     "@backstage/config": "^1.2.0",
-    "@backstage/plugin-catalog-node": "^1.13.0",
+    "@backstage/plugin-catalog-node": "^1.13.1",
     "@types/uuid": "^9.0.7",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
@@ -54,8 +54,8 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@backstage/backend-test-utils": "^1.0.0",
-    "@backstage/cli": "^0.27.1",
+    "@backstage/backend-test-utils": "^1.0.2",
+    "@backstage/cli": "^0.28.2",
     "typescript": "~5.6.2"
   },
   "files": [
