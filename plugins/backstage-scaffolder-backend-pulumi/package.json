@@ -42,7 +42,7 @@
     "@backstage/errors": "^1.2.4",
     "@backstage/integration": "^1.15.1",
     "@backstage/plugin-scaffolder-backend": "^1.26.2",
-    "@backstage/plugin-scaffolder-node": "^0.5.0",
+    "@backstage/plugin-scaffolder-node": "^0.5.1",
     "@backstage/types": "^1.1.1",
     "@pulumi/pulumi": "^3.112.0",
     "@types/node": "*",
