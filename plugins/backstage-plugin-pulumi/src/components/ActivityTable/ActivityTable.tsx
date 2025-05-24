@@ -3,7 +3,6 @@ import {PULUMI_PROJECT_SLUG_ANNOTATION} from "../constants";
 import {pulumiApiRef} from '../../api';
 import {useEntity} from '@backstage/plugin-catalog-react';
 import {Entity} from '@backstage/catalog-model';
-import React from "react";
 import {
     StatusError,
     StatusOK,

@@ -46,7 +46,7 @@ export function pulumiNewAction() {
                 }
 
                 if (ctx.input.args) {
-                    const additionalArgs = ctx.input.args.flatMap(x => x ? [x] : []);
+                    const additionalArgs = ctx.input.args.flatMap((x: any) => x ? [x] : []);
                     args.push(...additionalArgs);
                 }
 

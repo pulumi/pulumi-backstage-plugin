@@ -1,4 +1,4 @@
-import React, {ComponentProps, ReactNode} from 'react';
+import {ComponentProps, ReactNode} from 'react';
 import {
     PULUMI_ORGA_SLUG_ANNOTATION,
     PULUMI_PROJECT_SLUG_ANNOTATION
