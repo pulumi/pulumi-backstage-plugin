@@ -7,10 +7,10 @@ spec:
   targets:
   - ./entities.yaml
   - ./org.yaml
-  #- ./templates/eks-template/template.yaml
-  #- ./templates/gke-template/template.yaml
+  - ./templates/eks-template/template.yaml
+  - ./templates/gke-template/template.yaml
   - ./templates/aks-template/template.yaml
-  #- ./templates/civo-template/template.yaml
-  #- ./templates/local-pulumi-file-typescript/template.yaml
+  - ./templates/civo-template/template.yaml
+  - ./templates/local-pulumi-file-typescript/template.yaml
   - ./templates/microservice-kubernetes-template/template.yaml
-  #- ./templates/do-app-platform-template/template.yaml
+  - ./templates/do-app-platform-template/template.yaml

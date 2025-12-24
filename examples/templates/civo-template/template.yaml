@@ -1,15 +1,15 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: eks
+  name: civo-cluster
   title: Create a new CIVO cluster
   description: |
     A template for creating a new CIVO cluster via Pulumi.
   tags:
   - pulumi
-  - eks
-  - kubernetes
-  - aws
+  - civo
+  - infrastructure
+  - cluster
 spec:
   owner: user:guest
   type: infrastructure
