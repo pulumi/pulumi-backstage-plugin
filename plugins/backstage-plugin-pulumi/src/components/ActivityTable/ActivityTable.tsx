@@ -17,6 +17,7 @@ import {
 import {Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography, Tabs, Tab} from "@material-ui/core";
 import {ResourceChanges} from "../../api/types";
 import {DeploymentIcon} from "../PulumiIcon";
+import {statusColors, statusTextColors} from "../../styles";
 
 
 export const isPluginApplicableToEntity = (entity: Entity) =>
@@ -168,10 +169,10 @@ const ActivityTableContent = ({slug}: {slug: string}) => {
 
                     return (
                         <Box>
-                            {renderButton("+", resourceChanges ? resourceChanges.create : 0, "#437e37")}
-                            {renderButton("~", resourceChanges ? resourceChanges.update : 0, "#fed05d", "#313131")}
-                            {renderButton("", resourceChanges ? resourceChanges.same : 0, "#b0b0b0", "#313131")}
-                            {renderButton("-", resourceChanges ? resourceChanges.delete : 0, "#9e2626")}
+                            {renderButton("+", resourceChanges ? resourceChanges.create : 0, statusColors.create, statusTextColors.create)}
+                            {renderButton("~", resourceChanges ? resourceChanges.update : 0, statusColors.update, statusTextColors.update)}
+                            {renderButton("", resourceChanges ? resourceChanges.same : 0, statusColors.same, statusTextColors.same)}
+                            {renderButton("-", resourceChanges ? resourceChanges.delete : 0, statusColors.delete, statusTextColors.delete)}
                         </Box>
                     );
                 };
