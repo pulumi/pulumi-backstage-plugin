@@ -39,3 +39,109 @@ spec:
     message ExampleMessage {
       string example = 1;
     };
+---
+# =============================================================================
+# PULUMI MULTI-STACK/MULTI-ORG DEMO ENTITIES
+# =============================================================================
+# These entities demonstrate the new multi-stack and multi-org annotation support.
+# Update the slugs below to match your actual Pulumi stacks and organizations.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Demo: Component with SINGLE Pulumi stack (backwards compatible)
+# -----------------------------------------------------------------------------
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: pulumi-single-stack-demo
+  title: "Single Stack Demo"
+  description: |
+    Demonstrates a component linked to a single Pulumi stack.
+    This is the original annotation format and remains fully supported.
+  annotations:
+    # Single stack annotation (original format)
+    # ediri/otel-ai-chatbot-infra/ws has 49 resources
+    pulumi.com/project-slug: ediri/otel-ai-chatbot-infra/ws
+spec:
+  type: service
+  lifecycle: production
+  owner: guests
+  system: pulumi-demo-system
+---
+# -----------------------------------------------------------------------------
+# Demo: Component with MULTIPLE Pulumi stacks (NEW FEATURE)
+# -----------------------------------------------------------------------------
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: pulumi-multi-stack-demo
+  title: "Multi-Stack Demo"
+  description: |
+    Demonstrates a component linked to multiple Pulumi stacks using
+    comma-separated values. The UI will display tabs to switch between stacks.
+  annotations:
+    # Multiple stacks annotation (comma-separated) - NEW FEATURE!
+    # Format: org/project/stack,org/project/stack,...
+    # These stacks have real resources attached
+    pulumi.com/project-slug: ediri/otel-ai-chatbot-infra/ws,ediri/strands-agent-demo/dev,ediri/copenhagen-website/dev
+spec:
+  type: service
+  lifecycle: production
+  owner: guests
+  system: pulumi-demo-system
+---
+# -----------------------------------------------------------------------------
+# Demo: System with SINGLE Pulumi organization (backwards compatible)
+# -----------------------------------------------------------------------------
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: pulumi-demo-system
+  title: "Pulumi Demo System"
+  description: |
+    Demonstrates a system linked to a single Pulumi organization.
+    Shows organization metadata including member count, stack count, and resources.
+  annotations:
+    # Single organization annotation (original format)
+    pulumi.com/orga-slug: ediri
+spec:
+  owner: guests
+---
+# -----------------------------------------------------------------------------
+# Demo: System with MULTIPLE Pulumi organizations (NEW FEATURE)
+# -----------------------------------------------------------------------------
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: pulumi-multi-org-demo
+  title: "Multi-Org Demo"
+  description: |
+    Demonstrates a system linked to multiple Pulumi organizations using
+    comma-separated values. The UI will display tabs to switch between orgs.
+  annotations:
+    # Multiple organizations annotation (comma-separated) - NEW FEATURE!
+    # Format: org1,org2,org3,...
+    pulumi.com/orga-slug: ediri,dirien
+spec:
+  owner: guests
+---
+# -----------------------------------------------------------------------------
+# Demo: Component with multiple stacks across different organizations
+# -----------------------------------------------------------------------------
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: pulumi-cross-org-demo
+  title: "Cross-Organization Demo"
+  description: |
+    Demonstrates a component with stacks from multiple organizations.
+    Useful when a service has infrastructure managed by different teams/orgs.
+  annotations:
+    # Stacks from different organizations (ediri and dirien)
+    # dirien/demo-day/dev has 76 resources, ediri/strands-agent-demo/dev has 14 resources
+    pulumi.com/project-slug: dirien/demo-day/dev,ediri/strands-agent-demo/dev
+spec:
+  type: service
+  lifecycle: experimental
+  owner: guests
+  system: pulumi-demo-system
