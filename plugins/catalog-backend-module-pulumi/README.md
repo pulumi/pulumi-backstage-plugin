@@ -14,26 +14,11 @@ to your backend package:
 yarn add --cwd packages/backend @pulumi/plugin-catalog-backend-module-pulumi
 ```
 
-Update the catalog plugin initialization in your backend to add the provider and schedule it:
+Update the catalog plugin initialization in your backend to add the provider using the new Backstage Backend System:
 
-```diff
-+ import {PulumiEntityProvider} from '@pulumi/plugin-catalog-backend-module-pulumi';
-
- export default async function createPlugin(
-   env: PluginEnvironment,
- ): Promise<Router> {
-   const builder = await CatalogBuilder.create(env);
-
-+  builder.addEntityProvider(
-+    PulumiEntityProvider.fromConfig(env.config, {
-+      logger: env.logger,
-+      schedule: env.scheduler.createScheduledTaskRunner({
-+        frequency: { minutes: 10 },
-+        timeout: { minutes: 50 },
-+        initialDelay: { seconds: 15 }
-+      }),
-+    })
-+  );
+```typescript
+//packages/backend/src/index.ts
+backend.add(import('@pulumi/plugin-catalog-backend-module-pulumi/alpha'));
 ```
 
 After this, you also have to add some configuration in your app-config that describes what you want to import for that target.
@@ -50,40 +35,7 @@ catalog:
         api: https://api.pulumi.com
         organization: <your organization>
         pulumiAccessToken: ${PULUMI_ACCESS_TOKEN}
-```
-
-## Customize the Provider
-
-The default ingestion behaviour will likely not work for all use cases - you will want to set proper `Owner`, `System` and other fields for the
-ingested resources. In case you want to customize the ingested entities, the provider allows to pass a transformer for resources. Here we will show an example
-of overriding the default transformer.
-
-1. Create a transformer:
-
-```ts
-export const customResourceTransformer: ResourceTransformer = async (
-  stackDetail,
-  _config,
-): Promise<ResourceEntity | undefined> => {
-  // Transformations may change namespace, owner, change entity naming pattern, add labels, annotations, etc.
-
-  // Create the Resource Entity on your own, or wrap the default transformer
-  return await defaultResourceTransformer(stackDetail, config);
-};
-```
-
-2. Configure the provider with the transformer:
-
-```diff
-  builder.addEntityProvider(
-    PulumiEntityProvider.fromConfig(env.config, {
-      logger: env.logger,
-+     transformer: customResourceTransformer,
-      schedule: env.scheduler.createScheduledTaskRunner({
-        frequency: { minutes: 10 },
-        timeout: { minutes: 50 },
-        initialDelay: { seconds: 15 }
-      }),
-    })
-  );
+        schedule:
+          frequency: PT10M
+          timeout: PT50M
 ```

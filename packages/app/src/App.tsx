@@ -32,6 +32,7 @@ import {
     OAuthRequestDialog,
     SignInPage,
 } from '@backstage/core-components';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import { createApp } from '@backstage/app-defaults';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
@@ -105,6 +106,7 @@ const routes = (
 
 export default app.createRoot(
   <>
+    <CssBaseline />
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>

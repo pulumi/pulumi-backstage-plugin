@@ -11,38 +11,12 @@ You need to configure the action in your backend:
 yarn add --cwd packages/backend @pulumi/backstage-scaffolder-backend-pulumi
 ```
 
-Configure the action (you can check
-the [docs](https://backstage.io/docs/features/software-templates/writing-custom-actions#registering-custom-actions) to
-see all options):
+Configure the action using the new Backstage Backend System:
 
 ```typescript
-// packages/backend/src/plugins/scaffolder.ts
-import {
-    pulumiNewAction,
-    pulumiUpAction
-} from '@pulumi/backstage-scaffolder-backend-pulumi';
-
-const actions = [
-    pulumiNewAction(),
-    pulumiUpAction(),
-    ...createBuiltinActions({
-        integrations,
-        catalogClient,
-        config: env.config,
-        reader: env.reader,
-    })
-]
-
-return await createRouter({
-    actions,
-    logger: env.logger,
-    config: env.config,
-    database: env.database,
-    reader: env.reader,
-    catalogClient,
-    identity: env.identity,
-    permissions: env.permissions,
-});
+// packages/backend/src/index.ts
+const backend = createBackend();
+backend.add(import('@pulumi/backstage-scaffolder-backend-pulumi'));
 ```
 
 ### PULUMI_ACCESS_TOKEN
