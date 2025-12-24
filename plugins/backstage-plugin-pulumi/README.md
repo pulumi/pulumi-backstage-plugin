@@ -107,14 +107,30 @@ First, annotate your component/resource entity with the following:
 
 ```yaml
 annotations:
-  pulumi.com/project-slug: [ Pulumi Cloud Name: org/stackname/stack ]
+  pulumi.com/project-slug: <org/project/stack>
+```
+
+You can also specify multiple stacks using comma-separated values:
+
+```yaml
+annotations:
+  # Multiple stacks - displays as tabs in the UI
+  pulumi.com/project-slug: acme/web-app/prod,acme/web-app/staging,acme/api/prod
 ```
 
 And your system entity with the following:
 
 ```yaml
 annotations:
-  pulumi.com/orga-slug: <Pulumi Cloud: org>
+  pulumi.com/orga-slug: <org>
+```
+
+You can also specify multiple organizations using comma-separated values:
+
+```yaml
+annotations:
+  # Multiple organizations - displays as tabs in the UI
+  pulumi.com/orga-slug: acme,widgets-inc
 ```
 
 Next, provide the API token that the client will use to make requests to the Pulumi Cloud API.
@@ -132,7 +148,7 @@ proxy:
       Content-Type: application/json
 ```
 
-Then, start the backend, passing the PagerDuty API token as an environment variable:
+Then, start the backend, passing the Pulumi Access Token as an environment variable:
 
 ```bash
 export PULUMI_ACCESS_TOKEN='<PULUMI_ACCESS_TOKEN>' 

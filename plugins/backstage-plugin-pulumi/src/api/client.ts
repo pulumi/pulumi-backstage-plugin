@@ -91,15 +91,41 @@ export class PulumiClient implements PulumiApi {
         return metadata.json();
     }
 
-    // api/orgs/{organization}/search/resources/dashboard?facet=package&top=5
+    // api/orgs/{organization}/search/resourcesv2 - compute aggregations from resources
     async getDasboard(slug: string, facet: string, top: number): Promise<Dashboard> {
         const response = `${await this.config.discoveryApi.getBaseUrl(
             'proxy',
-        )}/pulumi/orgs/${slug}/search/resources/dashboard?facet=${facet}&top=${top}`;
-        const dashboard = await this.request(response, {
+        )}/pulumi/orgs/${slug}/search/resourcesv2?size=500`;
+        const result = await this.request(response, {
             method: 'GET',
-        })
-        return dashboard.json();
+        });
+        const data = await result.json();
+
+        // Compute aggregations from resources
+        const resources = data.resources || [];
+        const counts: Record<string, number> = {};
+
+        for (const resource of resources) {
+            const key = resource[facet] || 'unknown';
+            counts[key] = (counts[key] || 0) + 1;
+        }
+
+        // Sort by count and take top N
+        const sorted = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1]);
+
+        const topResults = sorted.slice(0, top);
+        const othersCount = sorted.slice(top).reduce((sum, [, count]) => sum + count, 0);
+
+        return {
+            total: data.total || 0,
+            aggregations: {
+                [facet]: {
+                    others: othersCount,
+                    results: topResults.map(([name, count]) => ({ name, count })),
+                },
+            },
+        };
     }
 
     // /api/console/orgs/{organization}/projects/{name}

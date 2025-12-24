@@ -1,5 +1,7 @@
+import {useState} from 'react';
 import {useApi} from "@backstage/core-plugin-api";
 import {PULUMI_PROJECT_SLUG_ANNOTATION} from "../constants";
+import {parseAnnotationValues} from "../utils";
 import {pulumiApiRef} from '../../api';
 import {useEntity} from '@backstage/plugin-catalog-react';
 import {Entity} from '@backstage/catalog-model';
@@ -12,7 +14,7 @@ import {
     Avatar,
     StatusRunning
 } from '@backstage/core-components';
-import {Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography} from "@material-ui/core";
+import {Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography, Tabs, Tab} from "@material-ui/core";
 import {ResourceChanges} from "../../api/types";
 import {DeploymentIcon} from "../PulumiIcon";
 
@@ -23,15 +25,17 @@ export const isPluginApplicableToEntity = (entity: Entity) =>
     );
 
 
-export const ActivityTable = () => {
-    const {entity} = useEntity();
+const ActivityTableContent = ({slug}: {slug: string}) => {
     const api = useApi(pulumiApiRef);
 
     const columns: TableColumn[] = [
         {
             title: 'Type', render: (row: any) => {
-                const obj = row.update ?? row.deployment.updates[0]
+                const obj = row.update ?? row.deployment?.updates?.[0]
                 const KindWrapper = () => {
+                    if (!obj?.info) {
+                        return <Typography variant="body1">-</Typography>;
+                    }
                     const addIcon = () => {
                         if (row.update === undefined) {
                             return (
@@ -42,17 +46,17 @@ export const ActivityTable = () => {
                         }
                         return null;
                     }
-                    let kind = obj.info.kind;
-                    let linkUrl = `https://app.pulumi.com/${entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION]}/updates/${obj.info.version}`
-                    if (obj.info.kind.startsWith("P")) {
+                    let kind = obj.info.kind ?? '';
+                    let linkUrl = `https://app.pulumi.com/${slug}/updates/${obj.info.version}`
+                    if (kind.startsWith("P")) {
                         kind = "Preview of Update"
-                        linkUrl = `https://app.pulumi.com/${entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION]}/previews/${obj.updateID}`
+                        linkUrl = `https://app.pulumi.com/${slug}/previews/${obj.updateID}`
                     } else {
                         kind = "Update"
                     }
-                    kind = `${kind}  #${obj.info.version}`
+                    kind = `${kind}  #${obj.info.version ?? ''}`
 
-                    if (obj.info.kind.indexOf("refresh") !== -1) {
+                    if ((obj.info.kind ?? '').indexOf("refresh") !== -1) {
 
                         kind = `${kind} (refresh)`
                     }
@@ -74,8 +78,11 @@ export const ActivityTable = () => {
         },
         {
             title: 'Status', field: 'result', render: (row: any) => {
-                const obj = row.update ?? row.deployment.updates[0]
+                const obj = row.update ?? row.deployment?.updates?.[0]
                 const StatusWrapper = () => {
+                    if (!obj?.info) {
+                        return <Typography variant="body1">-</Typography>;
+                    }
                     let status = <StatusOK>{obj.info.result}</StatusOK>
                     if (obj.info.result !== "succeeded") {
                         status = <StatusError>{obj.info.result}</StatusError>
@@ -94,10 +101,10 @@ export const ActivityTable = () => {
         {
             title: 'Message', field: 'message', render: (row: any) => {
                 const StatusWrapper = () => {
-                    const obj = row.update ?? row.deployment.updates[0]
+                    const obj = row.update ?? row.deployment?.updates?.[0]
                     return (
                         <Typography variant="body1" noWrap>
-                            {obj.info.message}
+                            {obj?.info?.message ?? '-'}
                         </Typography>
                     );
                 };
@@ -107,10 +114,10 @@ export const ActivityTable = () => {
         {
             title: 'Resources', field: 'resourceCount', render: (row: any) => {
                 const StatusWrapper = () => {
-                    const obj = row.update ?? row.deployment.updates[0]
+                    const obj = row.update ?? row.deployment?.updates?.[0]
                     return (
                         <Typography variant="body1" noWrap>
-                            {obj.info.resourceCount ?? 0}
+                            {obj?.info?.resourceCount ?? 0}
                         </Typography>
                     );
                 };
@@ -119,8 +126,11 @@ export const ActivityTable = () => {
         },
         {
             title: 'Requested By', render: (row: any) => {
-                const obj = row.update ?? row.deployment.updates[0]
+                const obj = row.update ?? row.deployment?.updates?.[0]
                 const StatusWrapper = () => {
+                    if (!obj?.requestedBy) {
+                        return <Typography variant="body1">-</Typography>;
+                    }
                     return (
                         <ListItem>
                             <ListItemIcon>
@@ -142,8 +152,8 @@ export const ActivityTable = () => {
         },
         {
             title: 'Changes', field: 'resourceChanges', render: (row: any) => {
-                const obj = row.update ?? row.deployment.updates[0]
-                const ResourceChangeWrapper = ({resourceChanges}: { resourceChanges: ResourceChanges }) => {
+                const obj = row.update ?? row.deployment?.updates?.[0]
+                const ResourceChangeWrapper = ({resourceChanges}: { resourceChanges: ResourceChanges | undefined }) => {
                     const renderButton = (label: string, value: number | undefined, color: string, fontColor?: string) => {
                         if (value && value > 0) {
                             return (
@@ -165,7 +175,7 @@ export const ActivityTable = () => {
                         </Box>
                     );
                 };
-                return <ResourceChangeWrapper resourceChanges={obj.info.resourceChanges}/>;
+                return <ResourceChangeWrapper resourceChanges={obj?.info?.resourceChanges}/>;
             }
         },
 
@@ -173,8 +183,7 @@ export const ActivityTable = () => {
 
     const previewData = async (_query: { page: number, pageSize: number }) => {
         try {
-
-            const previews = (await api.getPreviews(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? ''));
+            const previews = (await api.getPreviews(slug));
             if (previews.updates) {
                 previews.updates = previews.updates.slice(0, 3);
             }
@@ -187,7 +196,7 @@ export const ActivityTable = () => {
                     };
                 }),
                 itemsPerPage: previews.itemsPerPage,
-                total: previews.total, // Set the total to the number of updates
+                total: previews.total,
             };
 
             return {
@@ -207,7 +216,7 @@ export const ActivityTable = () => {
     const activityData = async (query: { page: number, pageSize: number }) => {
         if (query) {
             try {
-                const updates = (await api.listStackUpdates(entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION] ?? '', query.page + 1, query.pageSize));
+                const updates = (await api.listStackUpdates(slug, query.page + 1, query.pageSize));
                 return {
                     data: updates.activity ?? [],
                     page: query.page,
@@ -246,6 +255,65 @@ export const ActivityTable = () => {
                     data={activityData}
                 />
             </Box>
+        </Box>
+    );
+};
+
+export const ActivityTable = () => {
+    const {entity} = useEntity();
+
+    const slugs = parseAnnotationValues(
+        entity.metadata.annotations?.[PULUMI_PROJECT_SLUG_ANNOTATION]
+    );
+
+    const [selectedTab, setSelectedTab] = useState(0);
+
+    if (slugs.length === 0) {
+        return (
+            <Box>
+                <Typography variant="body1">
+                    No Pulumi stacks configured for this entity.
+                </Typography>
+            </Box>
+        );
+    }
+
+    // Single stack - render without tabs (backwards compatible)
+    if (slugs.length === 1) {
+        return <ActivityTableContent slug={slugs[0]} />;
+    }
+
+    // Multiple stacks - render with tabs
+    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+        setSelectedTab(newValue);
+    };
+
+    // Extract project/stack name from slug for tab label
+    const getTabLabel = (slug: string) => {
+        const parts = slug.split('/');
+        if (parts.length >= 3) {
+            return `${parts[1]}/${parts[2]}`; // project/stack
+        }
+        return slug;
+    };
+
+    return (
+        <Box>
+            <Box marginBottom={2}>
+                <Tabs
+                    value={selectedTab}
+                    onChange={handleTabChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                >
+                    {slugs.map((slug, index) => (
+                        <Tab key={slug} label={getTabLabel(slug)} id={`stack-tab-${index}`} />
+                    ))}
+                </Tabs>
+            </Box>
+            <ActivityTableContent key={slugs[selectedTab]} slug={slugs[selectedTab]} />
         </Box>
     );
 };

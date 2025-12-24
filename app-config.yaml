@@ -80,6 +80,13 @@ catalog:
         schedule:
           frequency: PT5M
           timeout: PT10M
+      dirien:
+        api: https://api.pulumi.com
+        organization: dirien
+        pulumiAccessToken: ${PULUMI_ACCESS_TOKEN}
+        schedule:
+          frequency: PT5M
+          timeout: PT10M
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration

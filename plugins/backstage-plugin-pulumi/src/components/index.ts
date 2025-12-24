@@ -5,3 +5,5 @@ export {
 } from './EntityPulumiCard/EntityPulumiCard'
 
 export * from './PulumiComponent'
+
+export { parseAnnotationValues } from './utils'
