@@ -36,6 +36,7 @@ import {
     TableCell,
 } from '@material-ui/core';
 import {PulumiIcon} from '../PulumiIcon';
+import {tableRowAlternate} from '../../styles';
 
 type StackData = {
     stack: Stack;
@@ -92,7 +93,7 @@ const OrgContent = ({orgData}: {orgData: OrgData}) => {
                 <Table size="small" style={{tableLayout: 'fixed'}}>
                     <TableBody>
                         {metadataRows.map((row, index) => (
-                            <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? 'rgba(0, 0, 0, 0.03)' : 'transparent'}}>
+                            <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
                                 <TableCell style={{fontWeight: 500, width: '50%'}}>{row.label}</TableCell>
                                 <TableCell>{row.value}</TableCell>
                             </TableRow>
@@ -112,13 +113,13 @@ const OrgContent = ({orgData}: {orgData: OrgData}) => {
                         <Table size="small" style={{tableLayout: 'fixed'}}>
                             <TableBody>
                                 {providerResults.map((result, index) => (
-                                    <TableRow key={result.name} style={{backgroundColor: index % 2 === 1 ? 'rgba(0, 0, 0, 0.03)' : 'transparent'}}>
+                                    <TableRow key={result.name} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
                                         <TableCell style={{fontWeight: 500, width: '50%'}}>{result.name}</TableCell>
                                         <TableCell>{result.count}</TableCell>
                                     </TableRow>
                                 ))}
                                 {othersCount > 0 && (
-                                    <TableRow style={{backgroundColor: providerResults.length % 2 === 1 ? 'rgba(0, 0, 0, 0.03)' : 'transparent'}}>
+                                    <TableRow style={{backgroundColor: providerResults.length % 2 === 1 ? tableRowAlternate : 'transparent'}}>
                                         <TableCell style={{fontWeight: 500, width: '50%'}}>other</TableCell>
                                         <TableCell>{othersCount}</TableCell>
                                     </TableRow>
@@ -268,7 +269,7 @@ const StackContent = ({stackData}: {stackData: StackData}) => {
         <Table size="small" style={{tableLayout: 'fixed'}}>
             <TableBody>
                 {metadataRows.map((row, index) => (
-                    <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? 'rgba(0, 0, 0, 0.03)' : 'transparent'}}>
+                    <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
                         <TableCell style={{fontWeight: 500, width: '50%'}}>{row.label}</TableCell>
                         <TableCell>{row.value}</TableCell>
                     </TableRow>

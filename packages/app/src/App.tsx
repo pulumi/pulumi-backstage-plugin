@@ -26,18 +26,21 @@ import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
 
-
 import {
     AlertDisplay,
     OAuthRequestDialog,
     SignInPage,
 } from '@backstage/core-components';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import { createApp } from '@backstage/app-defaults';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
+import { UnifiedThemeProvider } from '@backstage/theme';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import LightIcon from '@material-ui/icons/WbSunny';
+import DarkIcon from '@material-ui/icons/Brightness2';
+import { pulumiLightTheme, pulumiDarkTheme } from './themes';
 
 const app = createApp({
   apis,
@@ -58,9 +61,35 @@ const app = createApp({
       catalogIndex: catalogPlugin.routes.catalogIndex,
     });
   },
-    components: {
-        SignInPage: props => <SignInPage {...props} auto providers={['guest']} />,
+  components: {
+    SignInPage: props => <SignInPage {...props} auto providers={['guest']} />,
+  },
+  themes: [
+    {
+      id: 'pulumi-light',
+      title: 'Pulumi Light',
+      variant: 'light',
+      icon: <LightIcon />,
+      Provider: ({ children }) => (
+        <UnifiedThemeProvider theme={pulumiLightTheme}>
+          <CssBaseline />
+          {children}
+        </UnifiedThemeProvider>
+      ),
     },
+    {
+      id: 'pulumi-dark',
+      title: 'Pulumi Dark',
+      variant: 'dark',
+      icon: <DarkIcon />,
+      Provider: ({ children }) => (
+        <UnifiedThemeProvider theme={pulumiDarkTheme}>
+          <CssBaseline />
+          {children}
+        </UnifiedThemeProvider>
+      ),
+    },
+  ],
 });
 
 const routes = (
@@ -106,7 +135,6 @@ const routes = (
 
 export default app.createRoot(
   <>
-    <CssBaseline />
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>
