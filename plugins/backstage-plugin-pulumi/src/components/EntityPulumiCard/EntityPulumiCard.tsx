@@ -1,4 +1,4 @@
-import {ComponentProps, ReactNode} from 'react';
+import {ComponentProps, ReactNode, useState} from 'react';
 import {
     PULUMI_ORGA_SLUG_ANNOTATION,
     PULUMI_PROJECT_SLUG_ANNOTATION
@@ -12,8 +12,7 @@ import {
     Progress,
     InfoCard,
     BottomLinkProps,
-    TabbedCard,
-    CardTab,
+    BottomLink,
 } from '@backstage/core-components';
 import {useApi} from '@backstage/core-plugin-api';
 import useAsync from 'react-use/lib/useAsync';
@@ -34,9 +33,41 @@ import {
     TableBody,
     TableRow,
     TableCell,
+    Tabs,
+    Tab,
+    Divider,
+    makeStyles,
 } from '@material-ui/core';
 import {PulumiIcon} from '../PulumiIcon';
 import {tableRowAlternate} from '../../styles';
+
+const useTabStyles = makeStyles(
+    theme => ({
+        tabs: {
+            padding: theme.spacing(0, 2, 0, 2.5),
+            minHeight: theme.spacing(3),
+        },
+        indicator: {
+            backgroundColor: theme.palette.info.main,
+            height: theme.spacing(0.3),
+        },
+        tab: {
+            minWidth: theme.spacing(6),
+            minHeight: theme.spacing(3),
+            margin: theme.spacing(0, 2, 0, 0),
+            padding: theme.spacing(0.5, 0, 0.5, 0),
+            textTransform: 'none' as const,
+            '&:hover': {
+                opacity: 1,
+                backgroundColor: 'transparent',
+                color: theme.palette.text.primary,
+            },
+        },
+        selectedTab: {
+            fontWeight: theme.typography.fontWeightBold as number,
+        },
+    }),
+);
 
 type StackData = {
     stack: Stack;
@@ -228,30 +259,51 @@ export const EntityPulumiMetdataCard = () => {
         );
     }
 
-    // Multiple orgs - render with tabs
+    // Multiple orgs - render with tabs inside PulumiCard
     return (
-        <TabbedCard title="Pulumi Organizations">
-            {orgs.map((orgData) => (
-                <CardTab key={orgData.orgName} label={orgData.orgName}>
-                    <CardContent>
-                        <OrgContent orgData={orgData} />
-                        <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            style={{marginTop: 16}}
-                        >
-                            <a
-                                href={`https://app.pulumi.com/${orgData.orgName}/`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Open Dashboard →
-                            </a>
-                        </Typography>
-                    </CardContent>
-                </CardTab>
-            ))}
-        </TabbedCard>
+        <MultiOrgCard orgs={orgs} />
+    );
+};
+
+const MultiOrgCard = ({orgs}: {orgs: OrgData[]}) => {
+    const tabClasses = useTabStyles();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const selectedOrg = orgs[selectedIndex];
+
+    return (
+        <InfoCard>
+            <CardHeader
+                title="Pulumi"
+                avatar={<PulumiIcon style={{fontSize: 40}}/>}
+                titleTypographyProps={{variant: 'h5'}}
+            />
+            <Tabs
+                classes={{root: tabClasses.tabs, indicator: tabClasses.indicator}}
+                value={selectedIndex}
+                onChange={(_ev, newIndex) => setSelectedIndex(newIndex)}
+                style={{marginTop: 8}}
+            >
+                {orgs.map((orgData) => (
+                    <Tab
+                        key={orgData.orgName}
+                        label={orgData.orgName}
+                        disableRipple
+                        classes={{
+                            root: tabClasses.tab,
+                            selected: tabClasses.selectedTab,
+                        }}
+                    />
+                ))}
+            </Tabs>
+            <Divider />
+            <CardContent>
+                <OrgContent orgData={selectedOrg} />
+            </CardContent>
+            <BottomLink
+                link={`https://app.pulumi.com/${selectedOrg.orgName}/`}
+                title="Dashboard"
+            />
+        </InfoCard>
     );
 };
 
@@ -383,32 +435,50 @@ export const EntityPulumiCard = () => {
         );
     }
 
-    // Multiple stacks - render with tabs
+    // Multiple stacks - render with tabs inside PulumiCard
     return (
-        <TabbedCard title="Pulumi Stacks">
-            {stacks.map((stackData) => (
-                <CardTab
-                    key={stackData.slug}
-                    label={`${stackData.stack.projectName}/${stackData.stack.stackName}`}
-                >
-                    <CardContent>
-                        <StackContent stackData={stackData} />
-                        <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            style={{marginTop: 16}}
-                        >
-                            <a
-                                href={`https://app.pulumi.com/${stackData.stack.orgName}/${stackData.stack.projectName}/${stackData.stack.stackName}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Open in Pulumi Console →
-                            </a>
-                        </Typography>
-                    </CardContent>
-                </CardTab>
-            ))}
-        </TabbedCard>
+        <MultiStackCard stacks={stacks} />
+    );
+};
+
+const MultiStackCard = ({stacks}: {stacks: StackData[]}) => {
+    const tabClasses = useTabStyles();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const selectedStack = stacks[selectedIndex];
+
+    return (
+        <InfoCard>
+            <CardHeader
+                title="Pulumi"
+                avatar={<PulumiIcon style={{fontSize: 40}}/>}
+                titleTypographyProps={{variant: 'h5'}}
+            />
+            <Tabs
+                classes={{root: tabClasses.tabs, indicator: tabClasses.indicator}}
+                value={selectedIndex}
+                onChange={(_ev, newIndex) => setSelectedIndex(newIndex)}
+                style={{marginTop: 8}}
+            >
+                {stacks.map((stackData) => (
+                    <Tab
+                        key={stackData.slug}
+                        label={`${stackData.stack.projectName}/${stackData.stack.stackName}`}
+                        disableRipple
+                        classes={{
+                            root: tabClasses.tab,
+                            selected: tabClasses.selectedTab,
+                        }}
+                    />
+                ))}
+            </Tabs>
+            <Divider />
+            <CardContent>
+                <StackContent stackData={selectedStack} />
+            </CardContent>
+            <BottomLink
+                link={`https://app.pulumi.com/${selectedStack.stack.orgName}/${selectedStack.stack.projectName}/${selectedStack.stack.stackName}`}
+                title="Pulumi Console"
+            />
+        </InfoCard>
     );
 };
