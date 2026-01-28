@@ -8,6 +8,9 @@ import { rootRouteRef } from '../routes';
 /**
  * Page Extension - Pulumi Dashboard
  *
+ * Configurable via app-config.yaml:
+ * - path: defaults to '/pulumi'
+ *
  * @alpha
  */
 export const pulumiDashboardPage: any = PageBlueprint.make({

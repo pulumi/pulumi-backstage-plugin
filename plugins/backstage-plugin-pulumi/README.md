@@ -259,13 +259,11 @@ app:
     # Disable the Pulumi entity content tab
     - entity-content:pulumi/activity: false
 
-    # Customize the Pulumi entity content
+    # Customize the Pulumi entity content path and title
     - entity-content:pulumi/activity:
         config:
           path: '/infrastructure'
           title: 'Infrastructure'
-          filter:
-            kind: 'component'
 
     # Customize the Pulumi dashboard page path
     - page:pulumi:

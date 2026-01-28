@@ -5,6 +5,11 @@ import { isPulumiAvailableEntityPredicate } from './entityPredicates';
 /**
  * Entity Content Tab - Pulumi Activity
  *
+ * Configurable via app-config.yaml:
+ * - path: defaults to '/pulumi'
+ * - title: defaults to 'Pulumi'
+ * - filter: entity filter predicate
+ *
  * @alpha
  */
 export const entityPulumiContent: any = EntityContentBlueprint.make({
