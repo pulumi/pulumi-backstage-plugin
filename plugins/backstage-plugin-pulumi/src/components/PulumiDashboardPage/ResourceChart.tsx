@@ -76,14 +76,20 @@ const transformData = (data: ResourceSummaryPoint[]) => {
     }));
 };
 
+const formatDateForCSV = (point: ResourceSummaryPoint): string => {
+    if (point.day && point.month) {
+        return `${point.year}-${String(point.month).padStart(2, '0')}-${String(point.day).padStart(2, '0')}`;
+    }
+    if (point.month) {
+        return `${point.year}-${String(point.month).padStart(2, '0')}`;
+    }
+    return String(point.year);
+};
+
 const downloadCSV = (data: ResourceSummaryPoint[]) => {
     const headers = ['Date', 'Resources'];
     const rows = data.map(point => {
-        const date = point.day && point.month
-            ? `${point.year}-${String(point.month).padStart(2, '0')}-${String(point.day).padStart(2, '0')}`
-            : point.month
-                ? `${point.year}-${String(point.month).padStart(2, '0')}`
-                : String(point.year);
+        const date = formatDateForCSV(point);
         return `${date},${point.resources}`;
     });
 
@@ -113,6 +119,8 @@ export const ResourceChart = ({ data, loading, onTimeRangeChange }: ResourceChar
             case 'year':
                 onTimeRangeChange('monthly', 365);
                 break;
+            default:
+                onTimeRangeChange('daily', 30);
         }
     };
 
@@ -142,15 +150,17 @@ export const ResourceChart = ({ data, loading, onTimeRangeChange }: ResourceChar
                     Download CSV
                 </Button>
             </Box>
-            {loading ? (
+            {loading && (
                 <Box className={classes.chartContainer}>
                     <Progress />
                 </Box>
-            ) : chartData.length === 0 ? (
+            )}
+            {!loading && chartData.length === 0 && (
                 <Box className={classes.noData}>
                     No resource history data available
                 </Box>
-            ) : (
+            )}
+            {!loading && chartData.length > 0 && (
                 <Box className={classes.chartContainer}>
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>

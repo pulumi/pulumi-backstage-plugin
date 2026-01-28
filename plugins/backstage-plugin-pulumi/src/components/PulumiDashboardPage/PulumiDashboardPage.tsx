@@ -67,19 +67,11 @@ export const PulumiDashboardPage = () => {
             try {
                 setLoading(true);
                 const userData = await api.getCurrentUser();
-                // Debug: log the API response to understand the structure
-                console.log('Pulumi User API response:', JSON.stringify(userData, null, 2));
-                console.log('Organizations:', userData.organizations);
-                if (userData.organizations?.length > 0) {
-                    console.log('First org:', userData.organizations[0]);
-                    console.log('First org slug:', getOrgSlug(userData.organizations[0]));
-                }
                 setUser(userData);
                 if (userData.organizations?.length > 0) {
                     setSelectedOrg(getOrgSlug(userData.organizations[0]));
                 }
             } catch (err) {
-                console.error('Error fetching user:', err);
                 setError(err as Error);
             } finally {
                 setLoading(false);
@@ -135,8 +127,8 @@ export const PulumiDashboardPage = () => {
             setChartLoading(true);
             const resourceHistory = await api.getResourceHistory(selectedOrg, granularity, lookbackDays);
             setOrgData(prev => prev ? { ...prev, resourceHistory: resourceHistory.summary } : null);
-        } catch (err) {
-            console.error('Failed to fetch resource history:', err);
+        } catch {
+            // Error fetching resource history - silently ignore
         } finally {
             setChartLoading(false);
         }
@@ -196,9 +188,8 @@ export const PulumiDashboardPage = () => {
                     onOrgChange={handleOrgChange}
                 />
 
-                {orgLoading ? (
-                    <Progress />
-                ) : orgData ? (
+                {orgLoading && <Progress />}
+                {!orgLoading && orgData && (
                     <>
                         <Box className={classes.section}>
                             <StatsCards
@@ -234,7 +225,7 @@ export const PulumiDashboardPage = () => {
                             />
                         </Box>
                     </>
-                ) : null}
+                )}
             </Content>
         </Page>
     );
