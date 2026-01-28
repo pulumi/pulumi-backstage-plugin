@@ -14,3 +14,4 @@ spec:
   - ./templates/local-pulumi-file-typescript/template.yaml
   - ./templates/microservice-kubernetes-template/template.yaml
   - ./templates/do-app-platform-template/template.yaml
+  - ./templates/pulumi-deployment-template/template.yaml

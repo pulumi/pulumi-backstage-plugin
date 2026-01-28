@@ -1,10 +1,11 @@
-import {
-    createBackendModule,
-    coreServices,
-} from '@backstage/backend-plugin-api';
+import {createBackendModule} from '@backstage/backend-plugin-api';
 import {scaffolderActionsExtensionPoint} from '@backstage/plugin-scaffolder-node';
 import {pulumiNewAction} from "./actions/pulumiNew";
 import {pulumiUpAction} from "./actions/pulumiUp";
+import {pulumiPreviewAction} from "./actions/pulumiPreview";
+import {pulumiDestroyAction} from "./actions/pulumiDestroy";
+import {pulumiDeploymentRunAction} from "./actions/pulumiDeploymentRun";
+import {pulumiDeploymentConfigAction} from "./actions/pulumiDeploymentConfig";
 
 export const pulumiModule = createBackendModule({
     moduleId: 'pulumi',
@@ -13,12 +14,15 @@ export const pulumiModule = createBackendModule({
         registerInit({
             deps: {
                 scaffolderActions: scaffolderActionsExtensionPoint,
-                config: coreServices.rootConfig,
             },
             async init({scaffolderActions}) {
                 scaffolderActions.addActions(
                     pulumiNewAction(),
                     pulumiUpAction(),
+                    pulumiPreviewAction(),
+                    pulumiDestroyAction(),
+                    pulumiDeploymentRunAction(),
+                    pulumiDeploymentConfigAction(),
                 );
             },
         });

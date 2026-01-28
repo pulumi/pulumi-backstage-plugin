@@ -44,7 +44,8 @@
   },
   "resolutions": {
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react-dom": "^18",
+    "buffer-equal-constant-time": "npm:buffer-equals-constant@^1.0.0"
   },
   "prettier": "@backstage/cli/config/prettier",
   "lint-staged": {

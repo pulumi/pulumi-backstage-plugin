@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    github.com/project-slug: ${{ values.destination.owner }}/${{ values.destination.repo }}
+    pulumi.com/project-slug: ${{ values.organization }}/${{ values.name }}
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - infrastructure
+    - pulumi
+    - aws
+spec:
+  type: infrastructure
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  {% if values.system %}system: ${{ values.system }}{% endif %}

@@ -137,6 +137,11 @@ export class PulumiEntityProvider implements EntityProvider {
         for (const stack of data.stacks) {
             const stackDetails = await getStack(this.config, logger, stack.orgName, stack.projectName, stack.stackName)
 
+            // Skip stacks that couldn't be fetched (e.g., deleted or inaccessible)
+            if (!stackDetails) {
+                continue;
+            }
+
             const entity = await this.transformer(stackDetails, this.config);
             if (entity) {
                 entities.push(entity);

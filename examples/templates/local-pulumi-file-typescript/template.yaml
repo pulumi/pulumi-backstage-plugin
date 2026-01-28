@@ -64,6 +64,10 @@ spec:
         - Staging
         - Production
         description: The pulumi stack to use
+      escEnvironment:
+        title: ESC Environment (Optional)
+        type: string
+        description: Pulumi ESC environment to use for configuration and secrets (e.g., my-org/aws-dev)
   - title: Choose a location
     required:
     - repoUrl
@@ -111,6 +115,7 @@ spec:
       outputs:
       - helloMessage
       stack: ${{ parameters.stack }}
+      environments: ${{ [parameters.escEnvironment] if parameters.escEnvironment else [] }}
   output:
     text:
     - title: Hello Message

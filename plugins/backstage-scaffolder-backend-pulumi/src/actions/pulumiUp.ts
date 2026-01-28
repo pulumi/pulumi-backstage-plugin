@@ -5,7 +5,7 @@ import {InputError} from '@backstage/errors';
 export function pulumiUpAction() {
     return createTemplateAction({
         id: 'pulumi:up',
-        description: 'Runs Pulumi',
+        description: 'Runs Pulumi up to deploy infrastructure',
         schema: {
             input: {
                 stack: z => z.string().describe('The Pulumi stack to use'),
@@ -21,6 +21,8 @@ export function pulumiUpAction() {
                 providerCredentialsFromEnv: z => z.array(z.string()).optional().describe('The Pulumi project provider credentials to use'),
                 preRunCommands: z => z.array(z.string()).optional().describe('The Pulumi project pre-run commands to execute'),
                 suppressProgress: z => z.boolean().default(true).optional().describe('Suppress progress output'),
+                showSecrets: z => z.boolean().default(false).optional().describe('Show secret values in outputs (default: false)'),
+                environments: z => z.array(z.string()).optional().describe('ESC environments to add to the stack'),
             },
             output: {
                 outputs: z => z.record(z.union([z.string(), z.number(), z.any()])).describe('The Pulumi project outputs to return'),
@@ -55,17 +57,30 @@ export function pulumiUpAction() {
                 })
 
                 ctx.logger.info(`Successfully initialized stack ${s.name}`)
+
+                // Add ESC environments if specified
+                if (ctx.input.environments && ctx.input.environments.length > 0) {
+                    ctx.logger.info(`Adding ESC environments: ${ctx.input.environments.join(', ')}`);
+                    await s.addEnvironments(...ctx.input.environments);
+                }
+
                 ctx.logger.info(`Refreshing stack ${s.name}...`)
                 await s.refresh({onOutput: ctx.logger.info, suppressProgress: ctx.input.suppressProgress})
                 ctx.logger.info(`Successfully refreshed stack ${s.name}`)
 
                 ctx.logger.info(`Updating stack ${s.name}...`)
-                const up = await s.up({onOutput: ctx.logger.info, showSecrets: true, suppressProgress: ctx.input.suppressProgress})
+                const showSecrets = ctx.input.showSecrets ?? false;
+                const up = await s.up({onOutput: ctx.logger.info, showSecrets, suppressProgress: ctx.input.suppressProgress})
                 ctx.logger.info(`update summary: ${JSON.stringify(up.summary.resourceChanges, null, 4)}`)
                 if (ctx.input.outputs) {
                     const outputResults: Record<string, any> = {};
                     for (const output of ctx.input.outputs) {
-                        outputResults[output] = up.outputs[output].value;
+                        // Safe output handling: check if output exists before accessing value
+                        if (up.outputs[output] !== undefined) {
+                            outputResults[output] = up.outputs[output].value;
+                        } else {
+                            ctx.logger.warn(`Output '${output}' was requested but not found in stack outputs`);
+                        }
                     }
                     ctx.output('outputs', outputResults);
                 }
@@ -86,12 +101,16 @@ export function pulumiUpAction() {
                 const stackName = fullyQualifiedStackName(ctx.input.organization, ctx.input.name, ctx.input.stack);
 
                 // If we are using Pulumi Deployment, we need to set the provider credentials from the environment variables
-                // and pas them as envVars to the RemoteWorkspace.createOrSelectStack method
+                // and pass them as envVars to the RemoteWorkspace.createOrSelectStack method
                 const configCredentialsObject: { [k: string]: any } = {};
                 if (ctx.input.providerCredentialsFromEnv) {
                     for (const providerCredentialEnvName of ctx.input.providerCredentialsFromEnv) {
+                        const envValue = process.env[providerCredentialEnvName];
+                        if (envValue === undefined) {
+                            ctx.logger.warn(`Environment variable '${providerCredentialEnvName}' is not set`);
+                        }
                         configCredentialsObject[providerCredentialEnvName] = {
-                            secret: process.env[providerCredentialEnvName]
+                            secret: envValue
                         }
                     }
                 }
@@ -111,6 +130,19 @@ export function pulumiUpAction() {
                 ctx.logger.info(`Updating stack ${remoteStack.name}...`)
                 const up = await remoteStack.up({onOutput: ctx.logger.info})
                 ctx.logger.info(`update summary: ${JSON.stringify(up.summary.resourceChanges, null, 4)}`)
+
+                // Handle outputs for RemoteWorkspace as well
+                if (ctx.input.outputs) {
+                    const outputResults: Record<string, any> = {};
+                    for (const output of ctx.input.outputs) {
+                        if (up.outputs[output] !== undefined) {
+                            outputResults[output] = up.outputs[output].value;
+                        } else {
+                            ctx.logger.warn(`Output '${output}' was requested but not found in stack outputs`);
+                        }
+                    }
+                    ctx.output('outputs', outputResults);
+                }
             }
         }
     })

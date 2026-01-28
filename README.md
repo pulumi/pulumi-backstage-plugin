@@ -149,6 +149,7 @@ The Pulumi Up Action is a custom action that allows you to run the `pulumi up` c
 | providerCredentialsFromEnv | The Pulumi project provider credentials to use                      | array(string) | No       |
 | preRunCommands             | The Pulumi project pre-run commands to run                          | array(string) | No       |
 | suppressProgress           | Suppress progress output                                            | boolean       | No       |
+| environments               | ESC environments to add to the stack                                | array(string) | No       |
 
 The action offers also Pulumi deployment support, to use it you need to set the `deployment` input to `true`. If you did
 not set any `config` or `secretConfig`, during the `pulumi:new` action, you need to set them here. If you have any
@@ -187,11 +188,162 @@ spec:
 > the Pulumi SDK to work. This can now be done via the `preRunCommands` input.
 > For example for a node based Pulumi project you need to run `npm install` before running `pulumi up`.
 
+### Pulumi Preview Action
+
+The Pulumi Preview Action allows you to preview changes without deploying.
+
+`pulumi:preview`
+
+| Input            | Description                                            | Type          | Required |
+|------------------|--------------------------------------------------------|---------------|----------|
+| stack            | The Pulumi stack to use                                | string        | Yes      |
+| organization     | The Pulumi organization to use                         | string        | Yes      |
+| name             | The Pulumi project name to use                         | string        | Yes      |
+| config           | The Pulumi project config to use                       | object        | No       |
+| secretConfig     | The Pulumi project secret config to use                | object        | No       |
+| repoProjectPath  | The Pulumi project repo path to use                    | string        | No       |
+| preRunCommands   | Commands to execute before running preview             | array(string) | No       |
+| environments     | ESC environments to add to the stack                   | array(string) | No       |
+| expectNoChanges  | Return an error if any changes are proposed            | boolean       | No       |
+| refresh          | Refresh the stack state before preview (default: true) | boolean       | No       |
+
+**Output:** `changeSummary` - Summary of proposed changes by operation type.
+
+```yaml
+steps:
+  - id: pulumi-preview
+    name: Preview infrastructure changes
+    action: pulumi:preview
+    input:
+      name: my-infrastructure
+      organization: my-org
+      stack: dev
+      repoProjectPath: .
+      environments:
+        - my-org/my-esc-env
+```
+
+### Pulumi Destroy Action
+
+The Pulumi Destroy Action allows you to destroy stack resources. **Requires explicit confirmation.**
+
+`pulumi:destroy`
+
+| Input            | Description                                            | Type          | Required |
+|------------------|--------------------------------------------------------|---------------|----------|
+| stack            | The Pulumi stack to use                                | string        | Yes      |
+| organization     | The Pulumi organization to use                         | string        | Yes      |
+| name             | The Pulumi project name to use                         | string        | Yes      |
+| confirm          | Safety flag - must be set to true to execute destroy   | boolean       | Yes      |
+| repoProjectPath  | The Pulumi project repo path to use                    | string        | No       |
+| preRunCommands   | Commands to execute before running destroy             | array(string) | No       |
+| environments     | ESC environments to add to the stack                   | array(string) | No       |
+| removeStack      | Remove the stack after destroying resources            | boolean       | No       |
+| targetUrns       | Specific resource URNs to destroy                      | array(string) | No       |
+
+**Output:** `summary` - Summary of destroyed resources by operation type.
+
+```yaml
+steps:
+  - id: pulumi-destroy
+    name: Destroy infrastructure
+    action: pulumi:destroy
+    input:
+      name: my-infrastructure
+      organization: my-org
+      stack: dev
+      confirm: true  # Required safety flag
+      removeStack: true  # Optionally remove the stack after destroy
+```
+
+### Pulumi Deployment Config Action
+
+The Pulumi Deployment Config Action configures Pulumi Deployments settings via the Pulumi Cloud REST API.
+
+`pulumi:deployment:config`
+
+| Input            | Description                                            | Type   | Required |
+|------------------|--------------------------------------------------------|--------|----------|
+| organization     | The Pulumi organization                                | string | Yes      |
+| project          | The Pulumi project name                                | string | Yes      |
+| stack            | The Pulumi stack name                                  | string | Yes      |
+| sourceContext    | Git source configuration                               | object | No       |
+| operationContext | Operation context (env vars, OIDC, options)            | object | No       |
+| github           | GitHub integration settings                            | object | No       |
+| cacheOptions     | Cache options for deployments                          | object | No       |
+| executorContext  | Executor context configuration                         | object | No       |
+
+**Outputs:**
+- `settingsUrl` - URL to view deployment settings in Pulumi Cloud
+- `configured` - Whether settings were successfully configured
+
+```yaml
+steps:
+  - id: configure-deployment
+    name: Configure Pulumi Deployments
+    action: pulumi:deployment:config
+    input:
+      organization: my-org
+      project: my-project
+      stack: dev
+      sourceContext:
+        git:
+          repoUrl: https://github.com/my-org/my-repo
+          branch: main
+          repoDir: infrastructure
+      operationContext:
+        preRunCommands:
+          - npm install
+        oidc:
+          aws:
+            roleArn: arn:aws:iam::123456789:role/pulumi-deploy
+      github:
+        repository: my-org/my-repo
+        deployCommits: true
+        previewPullRequests: true
+```
+
+### Pulumi Deployment Run Action
+
+The Pulumi Deployment Run Action triggers a Pulumi Deployment via the Pulumi Cloud REST API.
+
+`pulumi:deployment:run`
+
+| Input            | Description                                                            | Type    | Required |
+|------------------|------------------------------------------------------------------------|---------|----------|
+| organization     | The Pulumi organization                                                | string  | Yes      |
+| project          | The Pulumi project name                                                | string  | Yes      |
+| stack            | The Pulumi stack name                                                  | string  | Yes      |
+| operation        | The operation to run (update, preview, refresh, destroy, detect-drift) | string  | Yes      |
+| inheritSettings  | Inherit deployment settings from stack configuration (default: true)   | boolean | No       |
+| operationContext | Override operation context settings                                    | object  | No       |
+| sourceContext    | Override source context settings                                       | object  | No       |
+
+**Outputs:**
+- `deploymentId` - The ID of the triggered deployment
+- `deploymentUrl` - URL to view the deployment in Pulumi Cloud
+- `version` - The deployment version number
+
+```yaml
+steps:
+  - id: trigger-deployment
+    name: Trigger Pulumi Deployment
+    action: pulumi:deployment:run
+    input:
+      organization: my-org
+      project: my-project
+      stack: prod
+      operation: update
+      inheritSettings: true
+```
+
 ## Pulumi Plugin
 
 - Display relevant Pulumi information about an entity within Backstage, such as the Pulumi stack, organization, project
   name, and project description.
+- Show stack outputs directly in the Pulumi card (e.g., URLs, resource IDs, connection strings).
 - Show the Pulumi activity view for an entity within Backstage.
+- Support for multiple stacks and organizations with tabbed UI.
 
 ### Requirements
 
@@ -211,6 +363,12 @@ spec:
 #### Pulumi Activity View
 
 <img src="plugins/backstage-plugin-pulumi/doc/activity.png" width="500">
+
+#### Multiple Stacks View
+
+When an entity has multiple stacks configured, they are displayed as tabs in the UI:
+
+<img src="plugins/backstage-plugin-pulumi/doc/multi-stack.png" width="500">
 
 ### Support
 

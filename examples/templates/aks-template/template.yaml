@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: eks
+  name: aks
   title: Create a new AKS cluster
   description: |
     This template creates a new AKS cluster using Pulumi. It creates a new Pulumi project, deploys the infrastructure, and registers the component in the catalog.
@@ -187,7 +187,6 @@ spec:
     name: Publish to GitHub
     action: publish:github
     input:
-      allowedHosts: ["github.com"]
       repoVisibility: public
       description: "This repository contains the infrastructure code for the ${{ parameters.name }} component"
       repoUrl: ${{ parameters.repoUrl }}
