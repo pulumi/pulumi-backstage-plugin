@@ -7,3 +7,5 @@ export {
 export * from './PulumiComponent'
 
 export { parseAnnotationValues } from './utils'
+
+export { PulumiIcon } from './PulumiIcon'

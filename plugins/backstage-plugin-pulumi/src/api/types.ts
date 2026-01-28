@@ -117,6 +117,80 @@ export type StackOutputValue = {
 
 export type StackOutputs = Record<string, StackOutputValue>;
 
+export type User = {
+    githubLogin: string;
+    name: string;
+    email: string;
+    avatarUrl: string;
+    organizations: UserOrganization[];
+};
+
+export type UserOrganization = {
+    name: string;
+    githubLogin?: string;
+    avatarUrl?: string;
+    // Some Pulumi API responses use 'login' instead of 'githubLogin'
+    login?: string;
+};
+
+export type Deployment = {
+    id: string;
+    created: string;
+    modified: string;
+    status: string;
+    version: number;
+    requestedBy: {
+        name: string;
+        githubLogin: string;
+        avatarUrl: string;
+    };
+    projectName: string;
+    stackName: string;
+};
+
+export type DeploymentList = {
+    deployments: Deployment[];
+    itemsPerPage: number;
+    total: number;
+};
+
+export type UserStack = {
+    orgName: string;
+    projectName: string;
+    stackName: string;
+    lastUpdate?: number;
+    resourceCount?: number;
+};
+
+export type UserStackList = {
+    stacks: UserStack[];
+    continuationToken?: string;
+};
+
+export type ResourceSummaryPoint = {
+    year: number;
+    month?: number;
+    day?: number;
+    hour?: number;
+    weekNumber?: number;
+    resources: number;
+};
+
+export type ResourceSummary = {
+    summary: ResourceSummaryPoint[];
+};
+
+export type EscEnvironment = {
+    organization: string;
+    project: string;
+    name: string;
+    created: string;
+    modified: string;
+};
+
+export type EscEnvironmentList = {
+    environments: EscEnvironment[];
+};
 
 export interface PulumiApi {
     getStack(
@@ -151,4 +225,26 @@ export interface PulumiApi {
     getStackOutputs(
         slug: string,
     ): Promise<StackOutputs>;
+
+    getCurrentUser(): Promise<User>;
+
+    listDeployments(
+        org: string,
+        page?: number,
+        pageSize?: number,
+    ): Promise<DeploymentList>;
+
+    listUserStacks(
+        org?: string,
+    ): Promise<UserStackList>;
+
+    getResourceHistory(
+        org: string,
+        granularity: string,
+        lookbackDays: number,
+    ): Promise<ResourceSummary>;
+
+    listEscEnvironments(
+        org: string,
+    ): Promise<EscEnvironmentList>;
 }

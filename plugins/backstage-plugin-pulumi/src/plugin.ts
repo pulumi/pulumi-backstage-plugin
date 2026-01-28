@@ -3,12 +3,17 @@ import {
     createApiFactory,
     createPlugin,
     createComponentExtension,
+    createRoutableExtension,
     discoveryApiRef,
     fetchApiRef,
 } from '@backstage/core-plugin-api';
+import { rootRouteRef } from './routes';
 
 export const pulumiPlugin = createPlugin({
     id: 'pulumi',
+    routes: {
+        root: rootRouteRef,
+    },
     apis: [
         createApiFactory({
             api: pulumiApiRef,
@@ -19,16 +24,14 @@ export const pulumiPlugin = createPlugin({
     ],
 });
 
-/*
-export const PulumiPage = pulumiPlugin.provide(
-  createRoutableExtension({
-    name: 'PulumiPage',
-    component: () =>
-      import('./components/ExampleComponent').then(m => m.ExampleComponent),
-    mountPoint: rootRouteRef,
-  }),
+export const PulumiDashboardPage = pulumiPlugin.provide(
+    createRoutableExtension({
+        name: 'PulumiDashboardPage',
+        component: () =>
+            import('./components/PulumiDashboardPage').then(m => m.PulumiDashboardPage),
+        mountPoint: rootRouteRef,
+    }),
 );
-*/
 
 export const EntityPulumiCard = pulumiPlugin.provide(
     createComponentExtension({

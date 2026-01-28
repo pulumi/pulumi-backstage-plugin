@@ -9,7 +9,12 @@ import {
     Dashboard,
     ProjectDetail,
     StackPreview,
-    StackOutputs
+    StackOutputs,
+    User,
+    DeploymentList,
+    UserStackList,
+    ResourceSummary,
+    EscEnvironmentList,
 } from './types';
 import {NotFoundError} from '@backstage/errors';
 
@@ -172,6 +177,71 @@ export class PulumiClient implements PulumiApi {
             }
         }
         return outputs;
+    }
+
+    // GET /api/user - Returns user info including organizations list
+    async getCurrentUser(): Promise<User> {
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/user`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        return result.json();
+    }
+
+    // GET /api/orgs/{org}/deployments - List deployments for org
+    async listDeployments(org: string, page?: number, pageSize?: number): Promise<DeploymentList> {
+        const params = new URLSearchParams();
+        if (page !== undefined) params.set('page', String(page));
+        if (pageSize !== undefined) params.set('pageSize', String(pageSize));
+        const queryString = params.toString();
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/orgs/${org}/deployments${queryString ? `?${queryString}` : ''}`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        return result.json();
+    }
+
+    // GET /api/user/stacks - List user's stacks with recent activity
+    async listUserStacks(org?: string): Promise<UserStackList> {
+        const params = new URLSearchParams();
+        if (org) params.set('organization', org);
+        const queryString = params.toString();
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/user/stacks${queryString ? `?${queryString}` : ''}`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        return result.json();
+    }
+
+    // GET /api/orgs/{org}/resources/summary - Resource count history for chart
+    async getResourceHistory(org: string, granularity: string, lookbackDays: number): Promise<ResourceSummary> {
+        const params = new URLSearchParams();
+        params.set('granularity', granularity);
+        params.set('lookbackDays', String(lookbackDays));
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/orgs/${org}/resources/summary?${params}`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        return result.json();
+    }
+
+    // GET /api/esc/environments/{org} - List ESC environments for org
+    async listEscEnvironments(org: string): Promise<EscEnvironmentList> {
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/esc/environments/${org}`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        return result.json();
     }
 
     private async request(
