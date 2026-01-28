@@ -4,10 +4,36 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "license": "MPL-2.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./alpha": "./src/alpha/index.ts",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "alpha": [
+        "src/alpha/index.ts"
+      ],
+      "package.json": [
+        "package.json"
+      ]
+    }
+  },
   "publishConfig": {
     "access": "public",
     "main": "dist/index.esm.js",
-    "types": "dist/index.d.ts"
+    "types": "dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      },
+      "./alpha": {
+        "types": "./dist/alpha/index.d.ts",
+        "default": "./dist/alpha/index.esm.js"
+      },
+      "./package.json": "./package.json"
+    }
   },
   "backstage": {
     "role": "frontend-plugin",
@@ -28,9 +54,11 @@
   },
   "dependencies": {
     "@backstage/catalog-model": "^1.7.6",
+    "@backstage/core-compat-api": "^0.5.7",
     "@backstage/core-components": "^0.18.4",
-    "@backstage/core-plugin-api": "^1.12.1",
+    "@backstage/core-plugin-api": "^1.12.2",
     "@backstage/errors": "^1.2.7",
+    "@backstage/frontend-plugin-api": "^0.13.4",
     "@backstage/plugin-catalog-react": "^1.21.4",
     "@backstage/plugin-kubernetes": "^0.12.14",
     "@backstage/plugin-kubernetes-common": "^0.9.9",
@@ -42,6 +70,7 @@
     "recharts": "^2.12.0"
   },
   "peerDependencies": {
+    "@backstage/frontend-plugin-api": "^0.13.4",
     "react": "^16.13.1 || ^17.0.0 || ^18.0.0"
   },
   "devDependencies": {

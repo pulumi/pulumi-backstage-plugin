@@ -31,7 +31,13 @@ import {
     OAuthRequestDialog,
     SignInPage,
 } from '@backstage/core-components';
-import { createApp } from '@backstage/app-defaults';
+import { createApp } from '@backstage/frontend-defaults';
+import {
+  convertLegacyAppOptions,
+  convertLegacyAppRoot,
+  convertLegacyRouteRef,
+  convertLegacyRouteRefs,
+} from '@backstage/core-compat-api';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
@@ -43,25 +49,12 @@ import DarkIcon from '@material-ui/icons/Brightness2';
 import { pulumiLightTheme, pulumiDarkTheme } from './themes';
 import { PulumiDashboardPage } from '@pulumi/backstage-plugin-pulumi';
 
-const app = createApp({
+// Import the Pulumi plugin for the new frontend system
+import pulumiPlugin from '@pulumi/backstage-plugin-pulumi/alpha';
+
+// Convert legacy app options to new frontend system features
+const legacyFeatures = convertLegacyAppOptions({
   apis,
-  bindRoutes({ bind }) {
-    bind(catalogPlugin.externalRoutes, {
-      createComponent: scaffolderPlugin.routes.root,
-      viewTechDoc: techdocsPlugin.routes.docRoot,
-      createFromTemplate: scaffolderPlugin.routes.selectedTemplate,
-    });
-    bind(apiDocsPlugin.externalRoutes, {
-      registerApi: catalogImportPlugin.routes.importPage,
-    });
-    bind(scaffolderPlugin.externalRoutes, {
-      registerComponent: catalogImportPlugin.routes.importPage,
-      viewTechDoc: techdocsPlugin.routes.docRoot,
-    });
-    bind(orgPlugin.externalRoutes, {
-      catalogIndex: catalogPlugin.routes.catalogIndex,
-    });
-  },
   components: {
     SignInPage: props => <SignInPage {...props} auto providers={['guest']} />,
   },
@@ -135,7 +128,8 @@ const routes = (
   </FlatRoutes>
 );
 
-export default app.createRoot(
+// Convert the legacy app root to new frontend system features
+const legacyRootFeatures = convertLegacyAppRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
@@ -144,3 +138,32 @@ export default app.createRoot(
     </AppRouter>
   </>,
 );
+
+// Create the app using the new frontend system
+const app = createApp({
+  features: [
+    legacyFeatures,
+    ...legacyRootFeatures,
+    // Add the Pulumi plugin using the new frontend system
+    pulumiPlugin,
+  ],
+  bindRoutes({ bind }) {
+    bind(convertLegacyRouteRefs(catalogPlugin.externalRoutes), {
+      createComponent: convertLegacyRouteRef(scaffolderPlugin.routes.root),
+      viewTechDoc: convertLegacyRouteRef(techdocsPlugin.routes.docRoot),
+      createFromTemplate: convertLegacyRouteRef(scaffolderPlugin.routes.selectedTemplate),
+    });
+    bind(convertLegacyRouteRefs(apiDocsPlugin.externalRoutes), {
+      registerApi: convertLegacyRouteRef(catalogImportPlugin.routes.importPage),
+    });
+    bind(convertLegacyRouteRefs(scaffolderPlugin.externalRoutes), {
+      registerComponent: convertLegacyRouteRef(catalogImportPlugin.routes.importPage),
+      viewTechDoc: convertLegacyRouteRef(techdocsPlugin.routes.docRoot),
+    });
+    bind(convertLegacyRouteRefs(orgPlugin.externalRoutes), {
+      catalogIndex: convertLegacyRouteRef(catalogPlugin.routes.catalogIndex),
+    });
+  },
+});
+
+export default app.createRoot();
