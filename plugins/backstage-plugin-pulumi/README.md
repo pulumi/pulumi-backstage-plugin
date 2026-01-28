@@ -4,6 +4,7 @@
   name, and project description.
 - Show stack outputs directly in the Pulumi card (e.g., URLs, resource IDs, connection strings).
 - Show the Pulumi activity view for an entity within Backstage.
+- **Pulumi Dashboard**: A standalone dashboard page showing organization-wide metrics, recent stack updates, deployments, and resource trends.
 
 ### Requirements
 
@@ -23,6 +24,16 @@
 #### Pulumi Activity View
 
 <img src="doc/activity.png" width="500">
+
+#### Pulumi Dashboard
+
+The Pulumi Dashboard provides an organization-wide view of your Pulumi infrastructure:
+
+- **Organization Selector**: Switch between Pulumi organizations you have access to
+- **Stats Cards**: View counts for Members, Stacks, ESC Environments, and Resources
+- **Latest Stack Updates**: See recent stack activity with status, timing, and resource changes
+- **Latest Deployments**: Monitor recent Pulumi Deployments with status and links
+- **Resource Trends**: Interactive chart showing resource count over time with configurable time ranges and CSV export
 
 ### Support
 
@@ -52,7 +63,8 @@ import {
     isPulumiAvailable,
     EntityPulumiCard,
     EntityPulumiMetdataCard,
-    PulumiComponent
+    PulumiComponent,
+    PulumiDashboardPage,
 } from '@pulumi/backstage-plugin-pulumi';
 ```
 
@@ -87,6 +99,23 @@ Now find the `serviceEntityPage` constant in `EntityPage.tsx`, and add the follo
 <EntityLayout.Route path="/pulumi" title="Pulumi" if={isPulumiAvailable}>
     {pulumiContent}
 </EntityLayout.Route>
+```
+
+#### Add the Pulumi Dashboard Page (Optional)
+
+To add the standalone Pulumi Dashboard page, add a route in your `App.tsx`:
+
+```tsx
+import { PulumiDashboardPage } from '@pulumi/backstage-plugin-pulumi';
+
+// In your routes
+<Route path="/pulumi" element={<PulumiDashboardPage />} />
+```
+
+You can also add a sidebar navigation item in your `Root.tsx`:
+
+```tsx
+<SidebarItem icon={YourIcon} to="pulumi" text="Pulumi" />
 ```
 
 Lastly, find the `systemPage` constant in `EntityPage.tsx`, and add the following snippet inside after the
