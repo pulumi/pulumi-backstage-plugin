@@ -65,6 +65,10 @@ spec:
         - Staging
         - Production
         description: The pulumi stack to use
+      escEnvironment:
+        title: ESC Environment (Optional)
+        type: string
+        description: The Pulumi ESC environment to use for secrets (e.g., my-org/my-env)
   - title: Choose a location
     required:
     - repoUrl
@@ -97,7 +101,6 @@ spec:
     name: Publish to GitHub
     action: publish:github
     input:
-      allowedHosts: ["github.com"]
       repoVisibility: public
       description: "This is ${{ parameters.component_id }}"
       repoUrl: ${{ parameters.repoUrl }}
@@ -119,6 +122,7 @@ spec:
       outputs:
       - url
       stack: ${{ parameters.stack }}
+      environments: ${{ [parameters.escEnvironment] if parameters.escEnvironment else [] }}
 
   - id: register
     name: Registering the Catalog Info Component

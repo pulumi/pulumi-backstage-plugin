@@ -1,0 +1,3 @@
+name: ${{ values.name }}
+description: ${{ values.description }}
+runtime: nodejs

@@ -110,6 +110,13 @@ export type ProjectDetail = {
     project: Project;
 }
 
+export type StackOutputValue = {
+    secret: boolean;
+    value: unknown;
+}
+
+export type StackOutputs = Record<string, StackOutputValue>;
+
 
 export interface PulumiApi {
     getStack(
@@ -140,4 +147,8 @@ export interface PulumiApi {
     getPreviews(
         slug: string,
     ): Promise<StackPreview>;
+
+    getStackOutputs(
+        slug: string,
+    ): Promise<StackOutputs>;
 }

@@ -135,7 +135,6 @@ spec:
     name: Publish to GitHub
     action: publish:github
     input:
-      allowedHosts: ["github.com"]
       repoVisibility: public
       description: "This repository contains the infrastructure code for the ${{ parameters.name }} component"
       repoUrl: ${{ parameters.repoUrl }}

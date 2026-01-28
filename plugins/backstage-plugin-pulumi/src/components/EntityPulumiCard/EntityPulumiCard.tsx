@@ -6,7 +6,7 @@ import {
 import {parseAnnotationValues} from '../utils';
 import {Entity} from '@backstage/catalog-model';
 import {pulumiApiRef} from '../../api';
-import {Stack, ProjectDetail, PulumiMetadata, Dashboard} from '../../api/types';
+import {Stack, ProjectDetail, PulumiMetadata, Dashboard, StackOutputs} from '../../api/types';
 import {useEntity} from '@backstage/plugin-catalog-react';
 import {
     Progress,
@@ -21,6 +21,7 @@ import {NotFoundError} from '@backstage/errors';
 import {Alert} from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Cloud from '@material-ui/icons/Cloud';
+import OutputIcon from '@material-ui/icons/CallMade';
 import {
     CardContent,
     CardHeader,
@@ -73,6 +74,7 @@ type StackData = {
     stack: Stack;
     project: ProjectDetail;
     slug: string;
+    outputs: StackOutputs;
 };
 
 type PulumiCardProps = {
@@ -308,6 +310,19 @@ const MultiOrgCard = ({orgs}: {orgs: OrgData[]}) => {
 };
 
 
+const formatOutputValue = (value: unknown): string => {
+    if (value === null || value === undefined) {
+        return '-';
+    }
+    if (typeof value === 'string') {
+        return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+    }
+    return JSON.stringify(value);
+};
+
 const StackContent = ({stackData}: {stackData: StackData}) => {
     const metadataRows = [
         {label: 'name', value: stackData.stack.stackName},
@@ -317,17 +332,56 @@ const StackContent = ({stackData}: {stackData: StackData}) => {
         {label: 'runtime', value: stackData.project.project.runtime},
     ];
 
+    const outputEntries = Object.entries(stackData.outputs || {});
+
     return (
-        <Table size="small" style={{tableLayout: 'fixed'}}>
-            <TableBody>
-                {metadataRows.map((row, index) => (
-                    <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
-                        <TableCell style={{fontWeight: 500, width: '50%'}}>{row.label}</TableCell>
-                        <TableCell>{row.value}</TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+        <Grid container spacing={3}>
+            <Grid item xs={12}>
+                <Table size="small" style={{tableLayout: 'fixed'}}>
+                    <TableBody>
+                        {metadataRows.map((row, index) => (
+                            <TableRow key={row.label} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
+                                <TableCell style={{fontWeight: 500, width: '50%'}}>{row.label}</TableCell>
+                                <TableCell>{row.value}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </Grid>
+            {outputEntries.length > 0 && (
+                <Grid item xs={12}>
+                    <Accordion TransitionProps={{unmountOnExit: true}} defaultExpanded>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                            <OutputIcon style={{fontSize: 24, marginRight: 8}}/>
+                            <Typography variant="h6">
+                                Stack Outputs
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails style={{padding: 0}}>
+                            <Table size="small" style={{tableLayout: 'fixed'}}>
+                                <TableBody>
+                                    {outputEntries.map(([key, output], index) => (
+                                        <TableRow key={key} style={{backgroundColor: index % 2 === 1 ? tableRowAlternate : 'transparent'}}>
+                                            <TableCell style={{fontWeight: 500, width: '40%'}}>
+                                                {key}
+                                                {output.secret && (
+                                                    <Typography variant="caption" color="textSecondary" style={{marginLeft: 8}}>
+                                                        (secret)
+                                                    </Typography>
+                                                )}
+                                            </TableCell>
+                                            <TableCell style={{wordBreak: 'break-all'}}>
+                                                {formatOutputValue(output.value)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </AccordionDetails>
+                    </Accordion>
+                </Grid>
+            )}
+        </Grid>
     );
 };
 
@@ -351,11 +405,15 @@ export const EntityPulumiCard = () => {
         const results = await Promise.all(
             slugs.map(async (slug) => {
                 const stack = await api.getStack(slug);
-                const project = await api.getProjectDetails(stack.orgName, stack.projectName);
+                const [project, outputs] = await Promise.all([
+                    api.getProjectDetails(stack.orgName, stack.projectName),
+                    api.getStackOutputs(slug).catch(() => ({})), // Gracefully handle if outputs fail
+                ]);
                 return {
                     stack,
                     project,
                     slug,
+                    outputs,
                 } as StackData;
             })
         );

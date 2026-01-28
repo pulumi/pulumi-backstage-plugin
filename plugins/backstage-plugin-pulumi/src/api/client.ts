@@ -8,7 +8,8 @@ import {
     PulumiMetadata,
     Dashboard,
     ProjectDetail,
-    StackPreview
+    StackPreview,
+    StackOutputs
 } from './types';
 import {NotFoundError} from '@backstage/errors';
 
@@ -137,6 +138,40 @@ export class PulumiClient implements PulumiApi {
             method: 'GET',
         })
         return project.json();
+    }
+
+    // /api/stacks/{organization}/{project}/{stack}/export
+    async getStackOutputs(slug: string): Promise<StackOutputs> {
+        const response = `${await this.config.discoveryApi.getBaseUrl(
+            'proxy',
+        )}/pulumi/stacks/${slug}/export`;
+        const result = await this.request(response, {
+            method: 'GET',
+        });
+        const data = await result.json();
+
+        // Extract outputs from the stack export
+        // The outputs are in the deployment.resources array, in the resource with type "pulumi:pulumi:Stack"
+        const outputs: StackOutputs = {};
+        const deployment = data.deployment;
+        if (deployment?.resources) {
+            const stackResource = deployment.resources.find(
+                (r: { type: string }) => r.type === 'pulumi:pulumi:Stack'
+            );
+            if (stackResource?.outputs) {
+                for (const [key, value] of Object.entries(stackResource.outputs)) {
+                    // Check if the value is a secret (wrapped in { "4dabf18193072939515e22adb298388d": "...", "ciphertext": "..." })
+                    const isSecret = typeof value === 'object' &&
+                        value !== null &&
+                        '4dabf18193072939515e22adb298388d' in (value as Record<string, unknown>);
+                    outputs[key] = {
+                        secret: isSecret,
+                        value: isSecret ? '[secret]' : value,
+                    };
+                }
+            }
+        }
+        return outputs;
     }
 
     private async request(

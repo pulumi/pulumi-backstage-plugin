@@ -2,6 +2,7 @@
 
 - Display relevant Pulumi information about an entity within Backstage, such as the Pulumi stack, organization, project
   name, and project description.
+- Show stack outputs directly in the Pulumi card (e.g., URLs, resource IDs, connection strings).
 - Show the Pulumi activity view for an entity within Backstage.
 
 ### Requirements
