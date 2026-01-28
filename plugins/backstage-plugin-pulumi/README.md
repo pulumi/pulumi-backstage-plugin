@@ -187,6 +187,90 @@ yarn start
 
 This will proxy the request by adding an `Authorization` header with the provided token.
 
+### New Frontend System
+
+This plugin supports the new Backstage frontend system. Follow these steps to use it in an application that supports the new frontend system.
+
+#### Package Detection
+
+Once you install the `@pulumi/backstage-plugin-pulumi` package, you can choose how the package should be detected by the app. The package can be automatically discovered when the feature discovery config is set, or it can be manually enabled via code.
+
+<table>
+  <tr>
+    <td>Via config</td>
+    <td>Via code</td>
+  </tr>
+  <tr>
+    <td>
+      <pre lang="yaml">
+# app-config.yaml
+app:
+  # Enable package discovery for all plugins
+  packages: 'all'
+---
+app:
+  # Enable package discovery only for Pulumi
+  packages:
+    include:
+      - '@pulumi/backstage-plugin-pulumi'
+      </pre>
+    </td>
+    <td>
+      <pre lang="typescript">
+// packages/app/src/App.tsx
+import { createApp } from '@backstage/frontend-defaults';
+import pulumiPlugin from '@pulumi/backstage-plugin-pulumi/alpha';
+
+const app = createApp({
+  features: [
+    // ...other plugins
+    pulumiPlugin,
+  ],
+});
+      </pre>
+    </td>
+  </tr>
+</table>
+
+#### Extensions Configuration
+
+The plugin installs the following extensions:
+
+| Extension | Kind | Description |
+|-----------|------|-------------|
+| `api:pulumi` | API | Pulumi API client for communicating with Pulumi Cloud |
+| `page:pulumi` | Page | Standalone Pulumi Dashboard page at `/pulumi` |
+| `entity-card:pulumi/stack` | Entity Card | Shows stack information, outputs, and metadata |
+| `entity-card:pulumi/metadata` | Entity Card | Shows organization metadata and resources by provider |
+| `entity-content:pulumi/activity` | Entity Content | Shows Pulumi activity/updates in an entity tab |
+
+You can configure these extensions in your `app-config.yaml`:
+
+```yaml
+# app-config.yaml
+app:
+  extensions:
+    # Disable the Pulumi stack card
+    - entity-card:pulumi/stack: false
+
+    # Disable the Pulumi metadata card
+    - entity-card:pulumi/metadata: false
+
+    # Disable the Pulumi entity content tab
+    - entity-content:pulumi/activity: false
+
+    # Customize the Pulumi entity content path and title
+    - entity-content:pulumi/activity:
+        config:
+          path: '/infrastructure'
+          title: 'Infrastructure'
+
+    # Customize the Pulumi dashboard page path
+    - page:pulumi:
+        config:
+          path: '/infrastructure-dashboard'
+```
+
 #### How to Uninstall
 
 1. Remove any configuration added in Backstage yaml files, such as the proxy configuration in `app-config.yaml` and the integration key in an entity's annotations.

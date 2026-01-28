@@ -19,7 +19,8 @@ describe('App', () => {
       ] as any,
     };
 
-    const rendered = render(<App />);
+    // App is now a React element (from app.createRoot()), not a component
+    const rendered = render(App);
 
     await waitFor(() => {
     expect(rendered.baseElement).toBeInTheDocument()
